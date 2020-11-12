@@ -19,7 +19,8 @@ spec:
     spec:
       containers:
       - name: collabora
-        image: collabora/code
+        image: collabora/code:latest
+        imagePullPolicy: Always
 
       restartPolicy: Always
 
