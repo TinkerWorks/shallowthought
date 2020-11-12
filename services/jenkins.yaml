@@ -12,10 +12,12 @@ spec:
     metadata:
       labels:
         app: jenkins
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/jenkins: unconfined 
     spec:
       containers:
       - name: jenkins
-        image: alseh/tinkerjenkins:latest # registry.tinker.haus/tinkerjenkins:jdk11
+        image: registry.tinker.haus/tinkerjenkins:centos # jenkins/jenkins:centos
         imagePullPolicy: Always
         ports:
         - name: webui
@@ -28,17 +30,23 @@ spec:
         volumeMounts:
           - name: jenkins-home
             mountPath: /var/jenkins_home
+          - name: artefacts
+            mountPath: /artefacts
         livenessProbe:
           httpGet:
             path: /login
             port: webui
           initialDelaySeconds: 30
-          periodSeconds: 3
+          periodSeconds: 10
       volumes:
         - name: jenkins-home
           hostPath:
             path: /servers/jenkins/home
             type: DirectoryOrCreate
+        - name: artefacts
+          hostPath:
+            path: /storage/artefacts
+            type: Directory
 
 ---
 apiVersion: v1
@@ -70,7 +78,7 @@ spec:
         - name: jenkins
           port: 80
       middlewares:
-        - name: default-ip-whitelist-local@kubernetescrd
+        - name: default-ip-whitelist-plus-github-local@kubernetescrd
         - name: services-strict-transport-security@kubernetescrd
 #        - name: redirect-redirect-to-https@kubernetescrd
 ---
@@ -89,7 +97,7 @@ spec:
         - name: jenkins
           port: 80
       middlewares:
-        - name: default-ip-whitelist-local@kubernetescrd
+        - name: default-ip-whitelist-plus-github-local@kubernetescrd
         - name: services-strict-transport-security@kubernetescrd
 #        - name: redirect-redirect-to-https@kubernetescrd
   tls:
@@ -98,3 +106,15 @@ spec:
     - main: "tinker.haus"
       sans:
       - "*.tinker.haus"
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strict-transport-security
+  namespace: services
+spec:
+  headers:
+    sslRedirect: true
+    stsPreload: true
+    stsSeconds: 15552000
+    customFrameOptionsValue: SAMEORIGIN
