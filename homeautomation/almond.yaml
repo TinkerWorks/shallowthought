@@ -1,61 +1,68 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nodered
+  name: almond
   namespace: homeautomation
 spec:
   selector:
     matchLabels:
-      app: nodered
+      app: almond
   replicas: 1
   template:
     metadata:
       labels:
-        app: nodered
+        app: almond
     spec:
       containers:
-      - name: nodered
-        image: nodered/node-red
+      - name: almond
+        image: stanfordoval/almond-server:latest-portable
         imagePullPolicy: Always
         ports:
-        - containerPort: 1880
+        - name: webui
+          containerPort: 3000
         volumeMounts:
-          - name: data
-            mountPath: /data
+          - name: varlib
+            mountPath: /var/lib/almond-server
+#        livenessProbe:
+#          httpGet:
+#            path: /
+#            port: webui
+#          initialDelaySeconds: 30
+#          periodSeconds: 3
       volumes:
-        - name: data
+        - name: varlib
           hostPath:
-            path: /servers/nodered
+            path: /servers/almond/varlib
             type: DirectoryOrCreate
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: nodered
+  name: almond
   namespace: homeautomation
 spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: 1880
+    targetPort: 3000
   type: NodePort
   selector:
-    app: nodered
+    app: almond
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: nodered
+  name: almond
   namespace: homeautomation
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`nodered.tinker.haus`)
+    - match: Host(`almond.tinker.haus`)
       kind: Rule
       services:
-        - name: nodered
+        - name: almond
           port: 80
       middlewares:
         - name: default-ip-whitelist-local@kubernetescrd

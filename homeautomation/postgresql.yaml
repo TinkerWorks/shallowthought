@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+  namespace: homeautomation
+spec:
+  selector:
+    matchLabels:
+      app: postgresql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+      - name: postgresql
+        image: postgres
+        imagePullPolicy: Always
+        env:
+        - name: POSTGRES_PASSWORD_FILE
+          value: /var/lib/postgresql/password
+        ports:
+        - containerPort: 8080
+        - containerPort: 5432
+        volumeMounts:
+          - name: db
+            mountPath: /var/lib/postgresql/data
+          - name: password
+            mountPath: /var/lib/postgresql/password
+      volumes:
+        - name: db
+          hostPath:
+            path: /servers/postgresql/data
+            type: DirectoryOrCreate
+        - name: password
+          hostPath:
+            path: /servers/postgresql/password
+            type: File
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: homeautomation
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+    name: eitieity
+  - port: 5432
+    protocol: TCP
+    targetPort: 5432
+    name: thisisit
+  type: NodePort
+  selector:
+    app: postgresql
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: postgresql
+  namespace: homeautomation
+spec:
+  entryPoints:
+    - postgresql
+  routes:
+  - match: HostSNI(`*`)
+    services:
+    - name: postgresql
+      port: 8080
