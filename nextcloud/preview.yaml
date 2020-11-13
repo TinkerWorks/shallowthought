@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: preview
+  name: preview
+  namespace: nextcloud
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: preview
+  template:
+    metadata:
+      labels:
+        app: preview
+    spec:
+      containers:
+      - name: preview
+        image: nextcloud:fpm
+        imagePullPolicy: Always
+        command: ['sh', '-c', "echo '*/10 * * * * /var/www/html/occ preview:pre-generate -vvvv' > /var/spool/cron/crontabs/www-data && /cron.sh"]
+        env:
+        - name: MYSQL_HOST
+          value: db
+        - name: MYSQL_DATABASE
+          value: nextcloud
+        - name: MYSQL_PASSWORD
+          value: nextcloud
+        - name: MYSQL_USER
+          value: nextcloud
+        - name: MYSQL_ROOT_PASSWORD
+          value: nextcloud
+        - name: REDIS_HOST
+          value: redis
+        volumeMounts:
+        - name: html
+          mountPath: /var/www/html
+      restartPolicy: Always
+      volumes:
+      - name: html
+        hostPath:
+          path: "/servers/nextcloud/html"
