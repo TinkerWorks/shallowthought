@@ -52,7 +52,7 @@ spec:
       volumes:
         - name: data
           hostPath:
-            path: /var/db/unifi
+            path: /servers/unifi/data
             type: DirectoryOrCreate
         - name: log
           hostPath:
