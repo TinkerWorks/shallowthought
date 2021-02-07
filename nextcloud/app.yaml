@@ -21,6 +21,8 @@ spec:
       - name: app
         image: registry.tinker.haus/tinkernextcloud # nextcloud:fpm
         imagePullPolicy: Always
+        command: ["/usr/bin/ionice"]
+        args: ["-c", "2", "-n", "2", "/entrypoint.sh", "php-fpm"]
         env:
         - name: MYSQL_HOST
           value: db
