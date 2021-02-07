@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: preview
-        image: nextcloud:fpm
+        image: registry.tinker.haus/tinkernextcloud # nextcloud:fpm
         imagePullPolicy: Always
         command: ['sh', '-c', "echo '*/10 * * * * /var/www/html/occ preview:pre-generate -vvvv' > /var/spool/cron/crontabs/www-data && /cron.sh"]
         env:
