@@ -81,3 +81,19 @@ spec:
     - main: "tinker.haus"
       sans:
       - "*.tinker.haus"
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: openhab
+  namespace: homeautomation
+spec:
+  entryPoints:
+    - openhab
+  routes:
+  - match: HostSNI(`*`)
+    services:
+    - name: openhab
+      port: 80
+      terminationDelay: 4000
