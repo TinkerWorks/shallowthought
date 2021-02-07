@@ -19,6 +19,9 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8086
+          protocol: TCP
+        - containerPort: 8089
+          protocol: UDP
         volumeMounts:
           - name: db
             mountPath: /var/lib/influxdb
@@ -35,9 +38,14 @@ metadata:
   namespace: homeautomation
 spec:
   ports:
-  - port: 8086
+  - name: "influxdbtcp"
+    port: 8086
     protocol: TCP
     targetPort: 8086
+  - name: "influxdbudp"
+    port: 8089
+    protocol: UDP
+    targetPort: 8089
   type: NodePort
   selector:
     app: influxdb
@@ -56,3 +64,18 @@ spec:
     services:
     - name: influxdb
       port: 8086
+      terminationDelay: 4000
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteUDP
+metadata:
+  name: ingressrouteudpinfluxdb
+  namespace: homeautomation
+spec:
+  entryPoints:
+    - influxdbudp
+  routes:
+  -  services:
+     - name: influxdb
+       port: 8089
