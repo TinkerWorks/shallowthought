@@ -25,7 +25,7 @@ spec:
       volumes:
         - name: db
           hostPath:
-            path: /servers/influxdb_noCoW
+            path: /servers/influxdb
             type: DirectoryOrCreate
 ---
 apiVersion: v1
