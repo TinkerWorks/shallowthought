@@ -48,11 +48,11 @@ spec:
   - port: 8080
     protocol: TCP
     targetPort: 8080
-    name: eitieity
+    name: "tcp_port"
   - port: 5432
     protocol: TCP
     targetPort: 5432
-    name: thisisit
+    name: "some_other_port"
   type: NodePort
   selector:
     app: postgresql
