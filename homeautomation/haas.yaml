@@ -27,8 +27,9 @@ spec:
           httpGet:
             path: /
             port: webui
-          initialDelaySeconds: 3600
-          periodSeconds: 30
+          initialDelaySeconds: 2160 # 30 minutes
+          periodSeconds: 60
+          timeoutSeconds: 15
       volumes:
         - name: config
           hostPath:
