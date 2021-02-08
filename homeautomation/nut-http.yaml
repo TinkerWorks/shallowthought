@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nut-http
+  namespace: homeautomation
+spec:
+  selector:
+    matchLabels:
+      app: nut-http
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nut-http
+    spec:
+      containers:
+      - name: nut-http
+        image: deetoreu/nut-http:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3001
+        volumeMounts:
+          - name: logs
+            mountPath: /usr/src/app/logs
+        env:
+          - name: NUT_ADDRESS
+            value: "10.1.1.42"
+      volumes:
+        - name: logs
+          hostPath:
+            path: /servers/nut-http/logs
+            type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nut-http
+  namespace: homeautomation
+spec:
+  ports:
+  - port: 3001
+    protocol: TCP
+    targetPort: 3001
+  type: NodePort
+  selector:
+    app: nut-http
