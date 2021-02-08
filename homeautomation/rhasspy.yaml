@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rhasspy
+  namespace: homeautomation
+spec:
+  selector:
+    matchLabels:
+      app: rhasspy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rhasspy
+    spec:
+      containers:
+      - name: rhasspy
+        image: rhasspy/rhasspy
+        imagePullPolicy: Always
+    #    command: ["printenv"]
+        args: ["--profile", "en", "--user-profiles", "/profiles"]
+        ports:
+        - name: webui
+          containerPort: 12101
+        volumeMounts:
+          - name: profiles
+            mountPath: /profiles
+          - name: localtime
+            mountPath: /etc/localtime
+#        livenessProbe:
+#          httpGet:
+#            path: /
+#            port: webui
+#          initialDelaySeconds: 30
+#          periodSeconds: 3
+      volumes:
+        - name: profiles
+          hostPath:
+            path: /servers/rhasspy/profiles
+            type: DirectoryOrCreate
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rhasspy
+  namespace: homeautomation
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 12101
+  type: NodePort
+  selector:
+    app: rhasspy
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: rhasspy
+  namespace: homeautomation
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`rhasspy.tinker.haus`)
+      kind: Rule
+      services:
+        - name: rhasspy
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+  tls:
+    certResolver: myresolver
+    domains:
+    - main: "tinker.haus"
+      sans:
+      - "*.tinker.haus"
