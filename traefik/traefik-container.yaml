@@ -40,9 +40,12 @@ spec:
             - --entrypoints.web.Address=:80
             - --entrypoints.websecure.Address=:443
             - --entrypoints.influxdb.Address=:8086
+            - --entrypoints.openhab.Address=:28080
+            - --entrypoints.influxdbudp.Address=:8089/udp
             - --entrypoints.traefik.Address=:30002
             - --entrypoints.transmissiontcp.Address=:51413
             - --entrypoints.transmissionudp.Address=:51413/udp
+#            - --entrypoints.postgresql.Address=:8080
             - --providers.kubernetescrd
             - --certificatesResolvers.myresolver.acme.dnsChallenge.provider=namecheap
             - --certificatesResolvers.myresolver.acme.email=alex.sever.h@gmail.com
@@ -58,6 +61,8 @@ spec:
           hostPort: 30002
         - containerPort: 8086
           hostPort: 8086
+        - containerPort: 28080
+          hostPort: 28080
         - containerPort: 51413
           hostPort: 51413
         - containerPort: 51413
