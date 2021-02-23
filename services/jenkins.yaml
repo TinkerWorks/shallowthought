@@ -30,8 +30,8 @@ spec:
         volumeMounts:
           - name: jenkins-home
             mountPath: /var/jenkins_home
-          - name: artefacts
-            mountPath: /artefacts
+          - name: storage
+            mountPath: /jenkins
         livenessProbe:
           httpGet:
             path: /login
@@ -44,9 +44,9 @@ spec:
           hostPath:
             path: /servers/jenkins/home
             type: DirectoryOrCreate
-        - name: artefacts
+        - name: storage
           hostPath:
-            path: /storage/artefacts
+            path: /jenkins
             type: Directory
 
 ---
