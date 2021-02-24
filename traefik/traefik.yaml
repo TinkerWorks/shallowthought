@@ -47,7 +47,7 @@ spec:
             - --entrypoints.transmissionudp.Address=:51413/udp
 #            - --entrypoints.postgresql.Address=:8080
             - --providers.kubernetescrd
-            - --certificatesResolvers.myresolver.acme.dnsChallenge.provider=namecheap
+            - --certificatesResolvers.myresolver.acme.dnsChallenge.provider=cloudflare
             - --certificatesResolvers.myresolver.acme.email=alex.sever.h@gmail.com
             - --certificatesResolvers.myresolver.acme.storage=/data/acme.json
 #            - --providers.file.directory=/dynamicconf/
@@ -71,22 +71,22 @@ spec:
         env:
         - name: TZ
           value: "Europe/Bucharest"
-        - name: NAMECHEAP_API_USER_FILE
-          value: "/namecheap/user"
-        - name: NAMECHEAP_API_KEY_FILE
-          value: "/namecheap/key"
+        - name: CF_API_EMAIL_FILE
+          value: "/cloudflare/user"
+        - name: CF_API_KEY_FILE
+          value: "/cloudflare/key"
         volumeMounts:
-        - name: namecheap-secret
-          mountPath: /namecheap
+        - name: cloudflare-secret
+          mountPath: /cloudflare
           readOnly: true
         - mountPath: "/data"
           name: data
 #        - mountPath: "/dynamicconf"
 #          name: dynamicconf
       volumes:
-      - name: namecheap-secret
+      - name: cloudflare-secret
         secret:
-          secretName: namecheap-secret
+          secretName: cloudflare-secret
       - name: data
         hostPath:
           path: /servers/traefik/data
