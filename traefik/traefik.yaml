@@ -45,7 +45,6 @@ spec:
             - --entrypoints.traefik.Address=:30002
             - --entrypoints.transmissiontcp.Address=:51413
             - --entrypoints.transmissionudp.Address=:51413/udp
-#            - --entrypoints.postgresql.Address=:8080
             - --providers.kubernetescrd
             - --certificatesResolvers.myresolver.acme.dnsChallenge.provider=cloudflare
             - --certificatesResolvers.myresolver.acme.email=alex.sever.h@gmail.com

@@ -56,18 +56,3 @@ spec:
   type: NodePort
   selector:
     app: postgresql
-
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRouteTCP
-metadata:
-  name: postgresql
-  namespace: homeautomation
-spec:
-  entryPoints:
-    - postgresql
-  routes:
-  - match: HostSNI(`*`)
-    services:
-    - name: postgresql
-      port: 8080
