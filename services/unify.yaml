@@ -42,13 +42,17 @@ spec:
             mountPath: /unifi/data
           - name: log
             mountPath: /unifi/log
-#          - name: cert
-#            mountPath: /unifi/cert
+          - name: cert
+            mountPath: /unifi/cert
         env:
           - name: TZ
             value: "Europe/Bucharest"
           - name: CERT_IS_CHAIN
             value: "true"
+          - name: CERTNAME
+            value: "certificate.pem"
+          - name: CERT_PRIVATE_NAME
+            value: "privatekey.pem"
       volumes:
         - name: data
           hostPath:
@@ -60,5 +64,5 @@ spec:
             type: DirectoryOrCreate
         - name: cert
           hostPath:
-            path: /servers/certificate/tinker.haus
+            path: /servers/traefik/certs/tinker.haus
             type: Directory
