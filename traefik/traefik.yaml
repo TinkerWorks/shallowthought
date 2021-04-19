@@ -29,6 +29,7 @@ spec:
         imagePullPolicy: Always
         args:
             - --log.level=INFO
+            - --pilot.dashboard=false
             - --api.insecure
             - --api.dashboard
             - --accesslog
