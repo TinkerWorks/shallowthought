@@ -96,3 +96,29 @@ spec:
     - main: "tinker.haus"
       sans:
       - "*.tinker.haus"
+
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: websecure-frontend-ingressroute-works-auth
+  namespace: nextcloud
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`nextcloud.tinker.works`)
+      kind: Rule
+      services:
+        - name: web-frontend
+          port: 80
+      middlewares:
+        - name: nextcloud-strict-transport-security@kubernetescrd
+        - name: nextcloud-nextcloud-redirect@kubernetescrd
+  tls:
+    certResolver: myresolver
+    domains:
+    - main: "tinker.works"
+      sans:
+      - "*.tinker.works"
