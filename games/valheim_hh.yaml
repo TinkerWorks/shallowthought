@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: valheim
+  name: valheim-hh
   namespace: games
 spec:
   selector:
     matchLabels:
-      app: valheim
+      app: valheim-hh
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
@@ -14,11 +14,11 @@ spec:
   template:
     metadata:
       labels:
-        app: valheim
+        app: valheim-hh
     spec:
       hostNetwork: true
       containers:
-      - name: valheim
+      - name: valheim-hh
         image: lloesche/valheim-server
         imagePullPolicy: Always
         ports:
@@ -26,15 +26,19 @@ spec:
           protocol: UDP
         - containerPort: 2457
           protocol: UDP
+        - containerPort: 2458
+          protocol: UDP
         env:
         - name: WORLD_NAME
-          value: "I'm a lumberjack and I'm OK"
+          value: "OmicronPersei8"
         - name: SERVER_NAME
-          value: "tinker.haus"
+          value: "OmicronPersei8"
         - name: SERVER_PASS
           value: "%%VALHEIM_PASS%%"
         - name: SERVER_PUBLIC
-          value: "false"
+          value: "true"
+        - name: SERVER_PORT
+          value: "2456"
         - name: TZ
           value: "Europe/Bucharest"
         volumeMounts:
@@ -45,9 +49,9 @@ spec:
       volumes:
         - name: config
           hostPath:
-            path: /servers/valheim/config
+            path: /var/srv/games/valheim-hh/config
             type: DirectoryOrCreate
         - name: server
           hostPath:
-            path: /servers/valheim/server
+            path: /var/srv/games/valheim-hh/server
             type: DirectoryOrCreate

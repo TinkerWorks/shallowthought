@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: valheim-lumberjack
+  namespace: games
+spec:
+  selector:
+    matchLabels:
+      app: valheim-lumberjack
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: valheim-lumberjack
+    spec:
+      hostNetwork: true
+      containers:
+      - name: valheim-lumberjack
+        image: lloesche/valheim-server
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 12456
+          protocol: UDP
+        - containerPort: 12457
+          protocol: UDP
+        - containerPort: 12458
+          protocol: UDP
+        env:
+        - name: WORLD_NAME
+          value: "I'm a lumberjack and I'm OK"
+        - name: SERVER_NAME
+          value: "tinker.haus"
+        - name: SERVER_PASS
+          value: "%%VALHEIM_PASS%%"
+        - name: SERVER_PUBLIC
+          value: "false"
+        - name: SERVER_PORT
+          value: "12456"
+        - name: TZ
+          value: "Europe/Bucharest"
+        volumeMounts:
+          - name: config
+            mountPath: /config
+          - name: server
+            mountPath: /opt/valheim
+      volumes:
+        - name: config
+          hostPath:
+            path: /var/srv/games/valheim-lumberjack/config
+            type: DirectoryOrCreate
+        - name: server
+          hostPath:
+            path: /var/srv/games/valheim-lumberjack/server
+            type: DirectoryOrCreate

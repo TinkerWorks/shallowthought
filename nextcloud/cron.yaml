@@ -36,10 +36,20 @@ spec:
         - name: REDIS_HOST
           value: redis
         volumeMounts:
-        - name: html
+        - name: nextcloud
           mountPath: /var/www/html
+        - name: data
+          mountPath: /data
+        - name: cache
+          mountPath: /cache
       restartPolicy: Always
       volumes:
-      - name: html
+      - name: nextcloud
         hostPath:
-          path: "/servers/nextcloud/html"
+          path: "/var/srv/nextcloud/html"
+      - name: data
+        hostPath:
+          path: "/servers/nextcloud/data"
+      - name: cache
+        hostPath:
+          path: "/var/srv/nextcloud/cache"

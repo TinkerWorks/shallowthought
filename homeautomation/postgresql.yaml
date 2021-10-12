@@ -31,11 +31,11 @@ spec:
       volumes:
         - name: db
           hostPath:
-            path: /servers/postgresql/data
+            path: /var/srv/homeautomation/postgresql/data
             type: DirectoryOrCreate
         - name: password
           hostPath:
-            path: /servers/postgresql/password
+            path: /var/srv/homeautomation/postgresql/password
             type: File
 ---
 apiVersion: v1

@@ -34,15 +34,15 @@ spec:
       volumes:
         - name: addons
           hostPath:
-            path: /servers/openhab/addons
+            path: /var/srv/homeautomation/openhab/addons
             type: DirectoryOrCreate
         - name: conf
           hostPath:
-            path: /servers/openhab/conf
+            path: /var/srv/homeautomation/openhab/conf
             type: DirectoryOrCreate
         - name: userdata
           hostPath:
-            path: /servers/openhab/userdata
+            path: /var/srv/homeautomation/openhab/userdata
             type: DirectoryOrCreate
 
 ---

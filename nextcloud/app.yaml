@@ -36,29 +36,26 @@ spec:
           value: nextcloud
         - name: REDIS_HOST
           value: redis
+        - name: NEXTCLOUD_DATA_DIR
+          value: "/data"
         volumeMounts:
-        - name: html
+        - name: nextcloud
           mountPath: /var/www/html
-        - name: pictures
-          mountPath: /pictures
-        - name: tv-shows
-          mountPath: /entertainment/tv-shows
-        - name: movies
-          mountPath: /entertainment/movies
+        - name: data
+          mountPath: /data
+        - name: cache
+          mountPath: /cache
       restartPolicy: Always
       volumes:
-      - name: html
+      - name: nextcloud
         hostPath:
-          path: "/servers/nextcloud/html"
-      - name: pictures
+          path: "/var/srv/nextcloud/html"
+      - name: cache
         hostPath:
-          path: "/pictures"
-      - name: tv-shows
+          path: "/var/srv/nextcloud/cache"
+      - name: data
         hostPath:
-          path: "/entertainment/tv-shows"
-      - name: movies
-        hostPath:
-          path: "/entertainment/movies"
+          path: "/servers/nextcloud/data"
 
 ---
 apiVersion: v1

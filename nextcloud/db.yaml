@@ -21,6 +21,7 @@ spec:
       - name: db
         image: mariadb
         imagePullPolicy: Always
+        args: ["--innodb-read-only-compressed=OFF"]
         env:
         - name: MYSQL_DATABASE
           value: nextcloud
@@ -33,18 +34,10 @@ spec:
         volumeMounts:
         - name: db
           mountPath: /var/lib/mysql
-#        volumeMounts:
-#        - name: conf
-#          mountPath: /etc/mysql/conf.d
       volumes:
       - name: db
         hostPath:
-          path: "/servers/nextcloud/db"
-#          path: "/var/db/mariadb"
-      - name: conf
-        hostPath:
-          path: "/servers/nextcloud/db-conf.d"
-
+          path: "/var/srv/nextcloud/db"
       restartPolicy: Always
 
 ---

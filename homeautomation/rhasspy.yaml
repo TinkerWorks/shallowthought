@@ -36,7 +36,7 @@ spec:
       volumes:
         - name: profiles
           hostPath:
-            path: /servers/rhasspy/profiles
+            path: /var/srv/homeautomation/rhasspy/profiles
             type: DirectoryOrCreate
         - name: localtime
           hostPath:

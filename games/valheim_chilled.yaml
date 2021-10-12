@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: valheim-chilled
+  namespace: games
+spec:
+  selector:
+    matchLabels:
+      app: valheim-chilled
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: valheim-chilled
+    spec:
+      hostNetwork: true
+      containers:
+      - name: valheim-chilled
+        image: lloesche/valheim-server
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 22456
+          protocol: UDP
+        - containerPort: 22457
+          protocol: UDP
+        - containerPort: 22458
+          protocol: UDP
+        env:
+        - name: WORLD_NAME
+          value: "ChilledPeepsWorld"
+        - name: SERVER_NAME
+          value: "ChilledPeeps"
+        - name: SERVER_PASS
+          value: "%%VALHEIM_PASS%%"
+        - name: SERVER_PUBLIC
+          value: "false"
+        - name: SERVER_PORT
+          value: "12456"
+        - name: TZ
+          value: "Europe/Bucharest"
+        volumeMounts:
+          - name: config
+            mountPath: /config
+          - name: server
+            mountPath: /opt/valheim
+      volumes:
+        - name: config
+          hostPath:
+            path: /var/srv/games/valheim-chilled/config
+            type: DirectoryOrCreate
+        - name: server
+          hostPath:
+            path: /var/srv/games/valheim-chilled/server
+            type: DirectoryOrCreate

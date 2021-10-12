@@ -16,13 +16,16 @@ spec:
       containers:
       - name: homeassistant
         image: homeassistant/home-assistant:stable
-        imagePullPolicy: Always
+#        imagePullPolicy: Always
         ports:
         - name: webui
           containerPort: 8123
         volumeMounts:
           - name: config
             mountPath: /config
+        env:
+          - name: PYTHONPATH
+            value: "/config/custom_components"
         livenessProbe:
           httpGet:
             path: /
@@ -30,10 +33,13 @@ spec:
           initialDelaySeconds: 2160 # 30 minutes
           periodSeconds: 60
           timeoutSeconds: 15
+        securityContext:
+          capabilities:
+            add: ["NET_RAW"]
       volumes:
         - name: config
           hostPath:
-            path: /servers/haas/config
+            path: /var/srv/homeautomation/haas/config
             type: DirectoryOrCreate
 
 ---

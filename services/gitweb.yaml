@@ -1,61 +1,71 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nodered
-  namespace: homeautomation
+  name: gitweb
+  namespace: services
 spec:
   selector:
     matchLabels:
-      app: nodered
+      app: gitweb
   replicas: 1
   template:
     metadata:
       labels:
-        app: nodered
+        app: gitweb
     spec:
       containers:
-      - name: nodered
-        image: nodered/node-red
+      - name: gitweb
+        image: fraoustin/gitweb
         imagePullPolicy: Always
         ports:
-        - containerPort: 1880
+        - containerPort: 80
+        env:
+        - name: CONTAINER_TIMEZONE
+          value: "Europe/Bucharest"
+#        - name: IHM
+#          value: "mdl"
+        - name: GITUSER
+          value: "gituser"
+        - name: GITPASSWORD
+          value: "gitpassword"
         volumeMounts:
-          - name: data
-            mountPath: /data
+          - name: repos
+            mountPath: /var/lib/git
       volumes:
-        - name: data
+        - name: repos
           hostPath:
-            path: /var/srv/homeautomation/nodered
+            path: /git
             type: DirectoryOrCreate
+
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: nodered
-  namespace: homeautomation
+  name: gitweb
+  namespace: services
 spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: 1880
+    targetPort: 80
   type: NodePort
   selector:
-    app: nodered
+    app: gitweb
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: nodered
-  namespace: homeautomation
+  name: gitweb-ingressroute-auth
+  namespace: services
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`nodered.tinker.haus`)
+    - match: Host(`gitweb.tinker.haus`)
       kind: Rule
       services:
-        - name: nodered
+        - name: gitweb
           port: 80
       middlewares:
         - name: default-ip-whitelist-local@kubernetescrd

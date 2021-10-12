@@ -1,67 +1,64 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nodered
-  namespace: homeautomation
+  name: tasmota
+  namespace: services
 spec:
   selector:
     matchLabels:
-      app: nodered
+      app: tasmota
   replicas: 1
   template:
     metadata:
       labels:
-        app: nodered
+        app: tasmota
     spec:
       containers:
-      - name: nodered
-        image: nodered/node-red
+      - name: tasmota
+        image: python:3
         imagePullPolicy: Always
+        workingDir: /tasmota
+        command: ['/usr/local/bin/python', '-m', "http.server", "8000"]
         ports:
-        - containerPort: 1880
+        - name: main
+          containerPort: 8000
         volumeMounts:
-          - name: data
-            mountPath: /data
+          - name: tasmota
+            mountPath: /tasmota
       volumes:
-        - name: data
+        - name: tasmota
           hostPath:
-            path: /var/srv/homeautomation/nodered
+            path: /jenkins/tasmota
             type: DirectoryOrCreate
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: nodered
-  namespace: homeautomation
+  name: tasmota
+  namespace: services
 spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: 1880
+    targetPort: 8000
   type: NodePort
   selector:
-    app: nodered
+    app: tasmota
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: nodered
-  namespace: homeautomation
+  name: tasmota-ingressroute-auth
+  namespace: services
 spec:
   entryPoints:
-    - websecure
+    - web
   routes:
-    - match: Host(`nodered.tinker.haus`)
+    - match: Host(`tasmota.tinker.haus`)
       kind: Rule
       services:
-        - name: nodered
+        - name: tasmota
           port: 80
       middlewares:
         - name: default-ip-whitelist-local@kubernetescrd
-  tls:
-    certResolver: myresolver
-    domains:
-    - main: "tinker.haus"
-      sans:
-      - "*.tinker.haus"

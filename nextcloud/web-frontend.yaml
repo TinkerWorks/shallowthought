@@ -29,17 +29,17 @@ spec:
         volumeMounts:
         - name: nginx-config
           mountPath: /etc/nginx/nginx.conf
-        - name: html
+        - name: nextcloud
           mountPath: /var/www/html
           readOnly: true
       volumes:
       - name: nginx-config
         hostPath:
-          path: "/servers/nextcloud/web-frontend/nginx.conf"
+          path: "/var/srv/nextcloud/nginx/nginx.conf"
           type: File
-      - name: html
+      - name: nextcloud
         hostPath:
-          path: "/servers/nextcloud/html"
+          path: "/var/srv/nextcloud/html"
 ---
 apiVersion: v1
 kind: Service

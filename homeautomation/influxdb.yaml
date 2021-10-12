@@ -22,30 +22,13 @@ spec:
           protocol: TCP
         - containerPort: 8089
           protocol: UDP
-#        env:
-#          - name: DOCKER_INFLUXDB_INIT_MODE
-#            value: "upgrade"
-#          - name: DOCKER_INFLUXDB_INIT_USERNAME
-#            value: "admin"
-#          - name: DOCKER_INFLUXDB_INIT_PASSWORD
-#            value: "SuperSecretPassword123+"
-#          - name: DOCKER_INFLUXDB_INIT_ORG
-#            value: "tinker.haus"
-#          - name: DOCKER_INFLUXDB_INIT_BUCKET
-#            value: "tinker-bucket"
         volumeMounts:
-          - name: influxdb
-            mountPath: /var/lib/influxdb
           - name: influxdb2
             mountPath: /var/lib/influxdb2
       volumes:
-        - name: influxdb
-          hostPath:
-            path: /servers/influxdb
-            type: DirectoryOrCreate
         - name: influxdb2
           hostPath:
-            path: /servers/influxdb2
+            path: /var/srv/homeautomation/influxdb2
             type: DirectoryOrCreate
 ---
 apiVersion: v1

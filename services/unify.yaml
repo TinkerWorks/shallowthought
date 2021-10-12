@@ -56,13 +56,13 @@ spec:
       volumes:
         - name: data
           hostPath:
-            path: /servers/unifi/data
+            path: /var/srv/services/unifi/data
             type: DirectoryOrCreate
         - name: log
           hostPath:
-            path: /servers/unifi/log
+            path: /var/srv/services/unifi/log
             type: DirectoryOrCreate
         - name: cert
           hostPath:
-            path: /servers/traefik/certs/tinker.haus
+            path: /var/srv/traefik/certs/tinker.haus
             type: Directory

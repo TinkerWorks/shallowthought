@@ -39,7 +39,7 @@ spec:
       volumes:
         - name: conf
           hostPath:
-            path: /servers/telegraf/telegraf.conf
+            path: /var/srv/homeautomation/telegraf/telegraf.conf
             type: FileOrCreate
         - name: hostfs
           hostPath:

@@ -19,17 +19,17 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 3001
-        volumeMounts:
-          - name: logs
-            mountPath: /usr/src/app/logs
+#        volumeMounts:
+#          - name: logs
+#            mountPath: /usr/src/app/logs
         env:
           - name: NUT_ADDRESS
             value: "10.1.1.42"
-      volumes:
-        - name: logs
-          hostPath:
-            path: /servers/nut-http/logs
-            type: DirectoryOrCreate
+#      volumes:
+#        - name: logs
+#          hostPath:
+#            path: /var/srv/homeautomation/nut-http/logs
+#            type: DirectoryOrCreate
 
 ---
 apiVersion: v1

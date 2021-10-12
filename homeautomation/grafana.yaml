@@ -30,7 +30,7 @@ spec:
       volumes:
         - name: varlibgrafana
           hostPath:
-            path: /servers/grafana/lib
+            path: /var/srv/homeautomation/grafana/lib
             type: DirectoryOrCreate
 
 ---

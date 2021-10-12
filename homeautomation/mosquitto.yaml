@@ -31,13 +31,13 @@ spec:
       volumes:
         - name: data
           hostPath:
-            path: /servers/mosquitto/data
+            path: /var/srv/homeautomation/mosquitto/data
             type: DirectoryOrCreate
         - name: config
           hostPath:
-            path: /servers/mosquitto/config
+            path: /var/srv/homeautomation/mosquitto/config
             type: DirectoryOrCreate
         - name: log
           hostPath:
-            path: /servers/mosquitto/log
+            path: /var/srv/homeautomation/mosquitto/log
             type: DirectoryOrCreate

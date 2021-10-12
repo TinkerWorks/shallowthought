@@ -33,9 +33,9 @@ spec:
       volumes:
       - name: data
         hostPath:
-          path: /servers/traefik/data
+          path: /var/srv/traefik/traefik/data
           type: DirectoryOrCreate
       - name: certs
         hostPath:
-          path: /servers/traefik/certs
+          path: /var/srv/traefik/traefik/certs
           type: DirectoryOrCreate

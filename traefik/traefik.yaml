@@ -26,7 +26,7 @@ spec:
       containers:
       - name: traefik
         image: traefik:latest
-        imagePullPolicy: Always
+#        imagePullPolicy: Always
         args:
             - --log.level=INFO
             - --pilot.dashboard=false
@@ -50,6 +50,7 @@ spec:
             - --certificatesResolvers.myresolver.acme.dnsChallenge.provider=cloudflare
             - --certificatesResolvers.myresolver.acme.email=alex.sever.h@gmail.com
             - --certificatesResolvers.myresolver.acme.storage=/data/acme.json
+            - --providers.kubernetescrd.allowCrossNamespace=true
 #            - --providers.file.directory=/dynamicconf/
 #            - --providers.file.watch=true
         ports:
@@ -89,9 +90,9 @@ spec:
           secretName: cloudflare-secret
       - name: data
         hostPath:
-          path: /servers/traefik/data
+          path: /var/srv/traefik/traefik/data
           type: DirectoryOrCreate
       - name: dynamicconf
         hostPath:
-          path: /servers/traefik/conf
+          path: /var/srv/traefik/traefik/conf
           type: DirectoryOrCreate
