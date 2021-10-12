@@ -15,7 +15,7 @@ spec:
       containers:
       - name: mosquitto
         image: eclipse-mosquitto
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         ports:
         - containerPort: 1883
           hostPort: 1883

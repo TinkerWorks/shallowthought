@@ -16,7 +16,7 @@ spec:
       containers:
       - name: rhasspy
         image: rhasspy/rhasspy
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
     #    command: ["printenv"]
         args: ["--profile", "en", "--user-profiles", "/profiles"]
         ports:

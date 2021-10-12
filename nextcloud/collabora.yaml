@@ -20,7 +20,7 @@ spec:
       containers:
       - name: collabora
         image: collabora/code:latest
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
 
       restartPolicy: Always
 

@@ -16,7 +16,7 @@ spec:
       containers:
       - name: registry
         image: registry:2
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         ports:
         - name: main
           containerPort: 5000

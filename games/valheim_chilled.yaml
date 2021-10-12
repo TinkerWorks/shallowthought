@@ -20,7 +20,7 @@ spec:
       containers:
       - name: valheim-chilled
         image: lloesche/valheim-server
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         ports:
         - containerPort: 22456
           protocol: UDP

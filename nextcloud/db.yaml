@@ -20,7 +20,7 @@ spec:
       containers:
       - name: db
         image: mariadb
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         args: ["--innodb-read-only-compressed=OFF"]
         env:
         - name: MYSQL_DATABASE

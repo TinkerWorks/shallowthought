@@ -16,7 +16,7 @@ spec:
       containers:
       - name: tasmota
         image: python:3
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         workingDir: /tasmota
         command: ['/usr/local/bin/python', '-m', "http.server", "8000"]
         ports:

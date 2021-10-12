@@ -16,7 +16,7 @@ spec:
       containers:
       - name: almond
         image: stanfordoval/almond-server:latest-portable
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         ports:
         - name: webui
           containerPort: 3000

@@ -20,7 +20,7 @@ spec:
       containers:
       - name: cron
         image: registry.tinker.haus/tinkernextcloud # nextcloud:fpm
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         command: ["/cron.sh"]
         env:
         - name: MYSQL_HOST

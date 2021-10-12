@@ -18,7 +18,7 @@ spec:
       containers:
       - name: traefik-certificate-extractor
         image: ldez/traefik-certs-dumper
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         args: ["file",
                "--source", "/data/acme.json",
                "--dest", "/certs", "--domain-subdir",

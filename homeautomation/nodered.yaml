@@ -16,7 +16,7 @@ spec:
       containers:
       - name: nodered
         image: nodered/node-red
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         ports:
         - containerPort: 1880
         volumeMounts:

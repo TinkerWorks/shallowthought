@@ -16,7 +16,7 @@ spec:
       containers:
       - name: jenkins
         image: jenkins/jenkins:jdk11
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         ports:
         - name: webui
           containerPort: 8080

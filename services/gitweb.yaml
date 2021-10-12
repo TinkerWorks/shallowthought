@@ -16,7 +16,7 @@ spec:
       containers:
       - name: gitweb
         image: fraoustin/gitweb
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         ports:
         - containerPort: 80
         env:
