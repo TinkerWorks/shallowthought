@@ -1,69 +1,64 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: registry
+  name: tasmota
   namespace: services
 spec:
   selector:
     matchLabels:
-      app: registry
+      app: tasmota
   replicas: 1
   template:
     metadata:
       labels:
-        app: registry
+        app: tasmota
     spec:
       containers:
-      - name: registry
-        image: registry:2
-        #imagePullPolicy: Always
+      - name: tasmota
+        image: registry.tinker.haus/pushgetserver
+        imagePullPolicy: Always
+        workingDir: /tasmota
         ports:
         - name: main
-          containerPort: 5000
+          containerPort: 8000
         volumeMounts:
-          - name: registry
-            mountPath: /var/lib/registry
+          - name: tasmota
+            mountPath: /tasmota
       volumes:
-        - name: registry
+        - name: tasmota
           hostPath:
-            path: /servers/registry
+            path: /jenkins/tasmota
             type: DirectoryOrCreate
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: registry
+  name: tasmota
   namespace: services
 spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: 5000
+    targetPort: 8000
   type: NodePort
   selector:
-    app: registry
+    app: tasmota
 
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: registry-ingressroute-auth
+  name: tasmota-ingressroute-auth
   namespace: services
 spec:
   entryPoints:
-    - websecure
+    - web
   routes:
-    - match: Host(`registry.tinker.haus`)
+    - match: Host(`tasmota.tinker.haus`)
       kind: Rule
       services:
-        - name: registry
+        - name: tasmota
           port: 80
       middlewares:
         - name: default-ip-whitelist-local@kubernetescrd
-  tls:
-    certResolver: myresolver
-    domains:
-    - main: "tinker.haus"
-      sans:
-      - "*.tinker.haus"

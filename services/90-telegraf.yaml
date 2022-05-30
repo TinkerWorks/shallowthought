@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: telegraf
-  namespace: homeautomation
+  namespace: services
 spec:
   selector:
     matchLabels:
@@ -15,8 +15,12 @@ spec:
       containers:
       - name: telegraf
         image: telegraf
-        #imagePullPolicy: Always
+        imagePullPolicy: Always
         args: ["--debug"]
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["SETFCAP"]
         env:
           - name: HOST_ETC
             value: "/hostfs/etc"
