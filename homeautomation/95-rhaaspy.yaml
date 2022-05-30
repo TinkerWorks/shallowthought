@@ -17,6 +17,7 @@ spec:
       - name: rhasspy
         image: rhasspy/rhasspy
         imagePullPolicy: Always
+        args: ["--profile", "en"]
         ports:
         - name: webui
           containerPort: 12101
