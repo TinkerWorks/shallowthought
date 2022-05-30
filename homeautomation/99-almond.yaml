@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       app: almond
-  replicas: 0
+  replicas: 1
   template:
     metadata:
       labels:
@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: almond
-        image: stanfordoval/almond-server:latest-portable
-        #imagePullPolicy: Always
+        image: stanfordoval/almond-server:latest
+        imagePullPolicy: Always
         ports:
         - name: webui
           containerPort: 3000

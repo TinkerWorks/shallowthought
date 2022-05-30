@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: zigbee2mqtt
+  namespace: homeautomation
+spec:
+  selector:
+    matchLabels:
+      app: zigbee2mqtt
+  template:
+    metadata:
+      labels:
+        app: zigbee2mqtt
+    spec:
+      containers:
+      - name: zigbee2mqtt
+        image: koenkk/zigbee2mqtt
+        imagePullPolicy: Always
+        ports:
+        - name: webui
+          containerPort: 8123
+        env:
+          - name: TZ
+            value: "Europe/Bucharest"
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["NET_RAW"]
+        volumeMounts:
+          - name: data
+            mountPath: /app/data
+          - name: cp210x
+            mountPath: /dev/cp210x
+      volumes:
+        - name: data
+          hostPath:
+            path: /var/srv/homeautomation/zigbee2mqtt/data
+            type: DirectoryOrCreate
+        - name: cp210x
+          hostPath:
+            path: /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_9a073488b729ec11a6edbd9c40c9ce8d-if00-port0 #TODO: This better
+            type: CharDevice
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zigbee2mqtt
+  namespace: homeautomation
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  type: NodePort
+  selector:
+    app: zigbee2mqtt
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: zigbee2mqtt-websecure
+  namespace: homeautomation
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`zigbee2mqtt.tinker.haus`)
+      kind: Rule
+      services:
+        - name: zigbee2mqtt
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+  tls:
+    certResolver: myresolver
+    domains:
+    - main: "tinker.haus"
+      sans:
+      - "*.tinker.haus"
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: zigbee2mqtt-web
+  namespace: homeautomation
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`zigbee2mqtt.tinker.haus`)
+      kind: Rule
+      services:
+        - name: zigbee2mqtt
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+        - name: default-redirect-to-https@kubernetescrd

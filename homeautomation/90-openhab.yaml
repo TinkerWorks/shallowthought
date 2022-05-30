@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: openhab
-        image: openhab/openhab:3.1.0-snapshot
-        #imagePullPolicy: Always
+        image: openhab/openhab:milestone
+        imagePullPolicy: Always
         ports:
         - containerPort: 28080
         volumeMounts:
@@ -59,11 +59,12 @@ spec:
   type: NodePort
   selector:
     app: openhab
+
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: openhab
+  name: openhab-websecure
   namespace: homeautomation
 spec:
   entryPoints:
@@ -85,16 +86,18 @@ spec:
 
 ---
 apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRouteTCP
+kind: IngressRoute
 metadata:
-  name: openhab
+  name: openhab-web
   namespace: homeautomation
 spec:
   entryPoints:
-    - openhab
+    - web
   routes:
-  - match: HostSNI(`*`)
-    services:
-    - name: openhab
-      port: 80
-      terminationDelay: 4000
+    - match: Host(`openhab.tinker.haus`)
+      kind: Rule
+      services:
+        - name: openhab
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd

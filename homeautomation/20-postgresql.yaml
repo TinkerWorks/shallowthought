@@ -16,7 +16,7 @@ spec:
       containers:
       - name: postgresql
         image: postgres
-        #imagePullPolicy: Always
+        imagePullPolicy: Always
         env:
         - name: POSTGRES_PASSWORD_FILE
           value: /var/lib/postgresql/password
@@ -37,6 +37,7 @@ spec:
           hostPath:
             path: /var/srv/homeautomation/postgresql/password
             type: File
+
 ---
 apiVersion: v1
 kind: Service

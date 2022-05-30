@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: grafana
-        image: monitoringartist/grafana-xxl:7.1 # grafana/grafana
-        #imagePullPolicy: Always
+        image: monitoringartist/grafana-xxl
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
         volumeMounts:

@@ -16,7 +16,7 @@ spec:
       containers:
       - name: nodered
         image: nodered/node-red
-        #imagePullPolicy: Always
+        imagePullPolicy: Always
         ports:
         - containerPort: 1880
         volumeMounts:
@@ -42,11 +42,12 @@ spec:
   type: NodePort
   selector:
     app: nodered
+
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: nodered
+  name: nodered-websecure
   namespace: homeautomation
 spec:
   entryPoints:
@@ -65,3 +66,23 @@ spec:
     - main: "tinker.haus"
       sans:
       - "*.tinker.haus"
+
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nodered-web
+  namespace: homeautomation
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`nodered.tinker.haus`)
+      kind: Rule
+      services:
+        - name: nodered
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+        - name: default-redirect-to-https@kubernetescrd

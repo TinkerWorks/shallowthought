@@ -16,9 +16,7 @@ spec:
       containers:
       - name: rhasspy
         image: rhasspy/rhasspy
-        #imagePullPolicy: Always
-    #    command: ["printenv"]
-        args: ["--profile", "en", "--user-profiles", "/profiles"]
+        imagePullPolicy: Always
         ports:
         - name: webui
           containerPort: 12101
@@ -56,11 +54,12 @@ spec:
   type: NodePort
   selector:
     app: rhasspy
+
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: rhasspy
+  name: rhasspy-websecure
   namespace: homeautomation
 spec:
   entryPoints:
@@ -79,3 +78,22 @@ spec:
     - main: "tinker.haus"
       sans:
       - "*.tinker.haus"
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: rhasspy-web
+  namespace: homeautomation
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`rhasspy.tinker.haus`)
+      kind: Rule
+      services:
+        - name: rhasspy
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+        - name: default-redirect-to-https@kubernetescrd
