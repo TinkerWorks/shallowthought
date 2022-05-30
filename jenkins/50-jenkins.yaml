@@ -13,10 +13,14 @@ spec:
       labels:
         app: jenkins
     spec:
+      serviceAccountName: jenkins
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
       - name: jenkins
-        image: jenkins/jenkins:jdk11
-        #imagePullPolicy: Always
+        image: registry.tinker.haus/jenkins # jenkins/jenkins:latest
+        imagePullPolicy: Always
         ports:
         - name: webui
           containerPort: 8080
@@ -25,11 +29,13 @@ spec:
         env:
           - name: TZ
             value: "Europe/Bucharest"
+          - name: PLUGINS_FORCE_UPGRADE
+            value: "true"
+          - name: JAVA_OPTS
+            value: "-Dorg.csanchez.jenkins.plugins.kubernetes.pipeline.ContainerExecDecorator.websocketConnectionTimeout=180"
         volumeMounts:
           - name: jenkins-home
             mountPath: /var/jenkins_home
-          - name: storage
-            mountPath: /jenkins
         livenessProbe:
           httpGet:
             path: /login
@@ -39,14 +45,48 @@ spec:
           timeoutSeconds: 15
       volumes:
         - name: jenkins-home
-          hostPath:
-            path: /var/srv/services/jenkins
-            type: DirectoryOrCreate
-        - name: storage
-          hostPath:
-            path: /jenkins
-            type: Directory
-
+          persistentVolumeClaim:
+            claimName: jenkins-home-claim
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jenkins-home-claim
+  namespace: jenkins
+spec:
+  volumeName: jenkins-home
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: my-local-storage
+  resources:
+    requests:
+      storage: 100Gi
+        
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jenkins-home
+  namespace: jenkins
+spec:
+  capacity:
+    storage: 100Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: my-local-storage
+  local:
+    path: /var/srv/jenkins/home
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - shallowthought
+         
 ---
 apiVersion: v1
 kind: Service
@@ -84,7 +124,6 @@ spec:
       middlewares:
         - name: default-ip-whitelist-plus-github-local@kubernetescrd
         - name: jenkins-strict-transport-security@kubernetescrd
-        - name: redirect-redirect-to-https@kubernetescrd
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
@@ -103,7 +142,6 @@ spec:
       middlewares:
         - name: default-ip-whitelist-plus-github-local@kubernetescrd
         - name: jenkins-strict-transport-security@kubernetescrd
-        - name: redirect-redirect-to-https@kubernetescrd
   tls:
     certResolver: myresolver
     domains:
