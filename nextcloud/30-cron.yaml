@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
       - name: cron
-        image: registry.tinker.haus/tinkernextcloud # nextcloud:fpm
-        #imagePullPolicy: Always
+        image: registry.tinker.haus/nextcloud
+        imagePullPolicy: Always
         command: ["/cron.sh"]
         env:
         - name: MYSQL_HOST
@@ -42,6 +42,8 @@ spec:
           mountPath: /data
         - name: cache
           mountPath: /cache
+        - name: storage
+          mountPath: /home-storage
       restartPolicy: Always
       volumes:
       - name: nextcloud
@@ -53,3 +55,6 @@ spec:
       - name: cache
         hostPath:
           path: "/var/srv/nextcloud/cache"
+      - name: storage
+        hostPath:
+          path: "/home-storage"

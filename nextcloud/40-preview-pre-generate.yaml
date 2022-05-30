@@ -2,8 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: preview
-  name: preview
+    app: preview-pre-generate
+  name: preview-pre-generate
   namespace: nextcloud
 spec:
   replicas: 1
@@ -11,17 +11,17 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: preview
+      app: preview-pre-generate
   template:
     metadata:
       labels:
-        app: preview
+        app: preview-pre-generate
     spec:
       containers:
-      - name: preview
-        image: registry.tinker.haus/tinkernextcloud # nextcloud:fpm
-        #imagePullPolicy: Always
-        command: ['sh', '-c', "echo '*/10 * * * * /var/www/html/occ preview:pre-generate -vvvv' > /var/spool/cron/crontabs/www-data && /cron.sh"]
+      - name: preview-pre-generate
+        image: registry.tinker.haus/nextcloud # nextcloud:fpm
+        imagePullPolicy: Always
+        command: ['sh', '-c', "echo '* * * * * /var/www/html/occ preview:pre-generate -vvvv' > /var/spool/cron/crontabs/www-data && /cron.sh"]
         env:
         - name: MYSQL_HOST
           value: db
@@ -42,6 +42,8 @@ spec:
           mountPath: /data
         - name: cache
           mountPath: /cache
+        - name: storage
+          mountPath: /home-storage
       restartPolicy: Always
       volumes:
       - name: nextcloud
@@ -53,3 +55,6 @@ spec:
       - name: cache
         hostPath:
           path: "/var/srv/nextcloud/cache"
+      - name: storage
+        hostPath:
+          path: "/home-storage"

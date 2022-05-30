@@ -20,7 +20,7 @@ spec:
       containers:
       - name: redis
         image: redis
-        #imagePullPolicy: Always
+        imagePullPolicy: Always
         ports:
         - containerPort: 6379
       restartPolicy: Always
