@@ -23,11 +23,46 @@ spec:
         volumeMounts:
           - name: registry
             mountPath: /var/lib/registry
+          - name: registry-config-yml
+            mountPath: "/etc/docker/registry"
+            readOnly: true
       volumes:
         - name: registry
           hostPath:
             path: /var/srv/services/registry
             type: DirectoryOrCreate
+        - name: registry-config-yml
+          configMap:
+            name: registry-config-yml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-config-yml
+  namespace: services
+data:
+  config.yml: |-
+   version: 0.1
+   log:
+     fields:
+       service: registry
+   storage:
+     cache:
+       blobdescriptor: inmemory
+     filesystem:
+       rootdirectory: /var/lib/registry
+   http:
+     addr: :5000
+     headers:
+       X-Content-Type-Options: [nosniff]
+   health:
+     storagedriver:
+       enabled: true
+       interval: 10s
+       threshold: 3
+   proxy:
+     remoteurl: https://registry-1.docker.io
+
 
 ---
 apiVersion: v1
