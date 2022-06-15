@@ -19,8 +19,8 @@ spec:
       hostNetwork: true
       containers:
       - name: unifi
-        image: jacobalberty/unifi:stable-6
-        #imagePullPolicy: Always
+        image: jacobalberty/unifi
+        imagePullPolicy: Always
         ports:
         - containerPort: 3478  # UDP Port used for STUN.
           protocol: UDP
