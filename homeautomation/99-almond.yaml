@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: almond
-        image: stanfordoval/almond-server:latest
+        image: docker-cache.tinker.haus/stanfordoval/almond-server:latest
         imagePullPolicy: Always
         ports:
         - name: webui

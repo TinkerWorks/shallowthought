@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: zigbee2mqtt
-        image: koenkk/zigbee2mqtt
+        image: docker-cache.tinker.haus/koenkk/zigbee2mqtt
         imagePullPolicy: Always
         ports:
         - name: webui

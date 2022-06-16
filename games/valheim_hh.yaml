@@ -19,7 +19,7 @@ spec:
       hostNetwork: true
       containers:
       - name: valheim-hh
-        image: lloesche/valheim-server
+        image: docker-cache.tinker.haus/lloesche/valheim-server
         imagePullPolicy: Always
         ports:
         - containerPort: 2456

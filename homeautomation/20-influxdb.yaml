@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: influxdb
-        image: influxdb
+        image: docker-cache.tinker.haus/library/influxdb:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8086
@@ -30,6 +30,7 @@ spec:
           hostPath:
             path: /var/srv/homeautomation/influxdb2
             type: DirectoryOrCreate
+
 ---
 apiVersion: v1
 kind: Service

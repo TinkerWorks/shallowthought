@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: rhasspy
-        image: rhasspy/rhasspy
+        image: docker-cache.tinker.haus/rhasspy/rhasspy
         imagePullPolicy: Always
         args: ["--profile", "en"]
         ports:

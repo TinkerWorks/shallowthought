@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: openhab
-        image: openhab/openhab:milestone
+        image: docker-cache.tinker.haus/openhab/openhab:milestone
         imagePullPolicy: Always
         ports:
         - containerPort: 28080

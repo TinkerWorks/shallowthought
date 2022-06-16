@@ -25,8 +25,7 @@ spec:
       hostNetwork: true
       containers:
       - name: traefik
-        image: traefik:latest
-        imagePullPolicy: Always
+        image: library/traefik:latest
         args:
             - --log.level=INFO
             - --pilot.dashboard=false

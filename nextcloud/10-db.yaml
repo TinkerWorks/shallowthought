@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: db
-        image: mariadb
+        image: docker-cache.tinker.haus/library/mariadb
         imagePullPolicy: Always
         args: ["--innodb-read-only-compressed=OFF"]
         env:

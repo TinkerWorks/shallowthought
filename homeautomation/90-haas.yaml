@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: homeassistant
-        image: homeassistant/home-assistant:latest
+        image: docker-cache.tinker.haus/homeassistant/home-assistant:latest
         imagePullPolicy: Always
         ports:
         - name: webui

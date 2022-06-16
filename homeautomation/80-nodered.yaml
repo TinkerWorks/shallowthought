@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: nodered
-        image: nodered/node-red
+        image: docker-cache.tinker.haus/nodered/node-red
         imagePullPolicy: Always
         ports:
         - containerPort: 1880

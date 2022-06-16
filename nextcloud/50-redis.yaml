@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: redis
-        image: redis
+        image: docker-cache.tinker.haus/library/redis
         imagePullPolicy: Always
         ports:
         - containerPort: 6379

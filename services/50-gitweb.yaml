@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: gitweb
-        image: fraoustin/gitweb
+        image: docker-cache.tinker.haus/fraoustin/gitweb
         imagePullPolicy: Always
         ports:
         - containerPort: 80

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: nut-http
-        image: deetoreu/nut-http
+        image: docker-cache.tinker.haus/deetoreu/nut-http
         imagePullPolicy: Always
         ports:
         - containerPort: 3001
