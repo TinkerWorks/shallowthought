@@ -32,7 +32,7 @@ spec:
       volumes:
         - name: repos
           hostPath:
-            path: /git
+            path: /servers/git
             type: DirectoryOrCreate
 
 ---
@@ -54,34 +54,11 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: gitweb-websecure
+  name: gitweb
   namespace: services
 spec:
   entryPoints:
-    - websecure
-  routes:
-    - match: Host(`gitweb.tinker.haus`)
-      kind: Rule
-      services:
-        - name: gitweb
-          port: 80
-      middlewares:
-        - name: default-ip-whitelist-local@kubernetescrd
-  tls:
-    certResolver: myresolver
-    domains:
-    - main: "tinker.haus"
-      sans:
-      - "*.tinker.haus"
-
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
-metadata:
-  name: gitweb-web
-  namespace: services
-spec:
-  entryPoints:
+    - web
     - websecure
   routes:
     - match: Host(`gitweb.tinker.haus`)

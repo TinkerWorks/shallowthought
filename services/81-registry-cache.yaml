@@ -83,35 +83,11 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: docker-cache-websecure
+  name: docker-cache
   namespace: services
 spec:
   entryPoints:
-    - websecure
-  routes:
-    - match: Host(`docker-cache.tinker.haus`)
-      kind: Rule
-      services:
-        - name: docker-cache
-          port: 80
-      middlewares:
-        - name: default-ip-whitelist-local@kubernetescrd
-  tls:
-    certResolver: myresolver
-    domains:
-    - main: "tinker.haus"
-      sans:
-      - "*.tinker.haus"
-
-
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
-metadata:
-  name: docker-cache-web
-  namespace: services
-spec:
-  entryPoints:
+    - web
     - websecure
   routes:
     - match: Host(`docker-cache.tinker.haus`)

@@ -86,6 +86,7 @@ spec:
           operator: In
           values:
           - shallowthought
+          - shallowtrial
          
 ---
 apiVersion: v1
@@ -110,28 +111,11 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: jenkins-ingressroute-auth
+  name: jenkins
   namespace: jenkins
 spec:
   entryPoints:
     - web
-  routes:
-    - match: Host(`kenjins.tinker.haus`)
-      kind: Rule
-      services:
-        - name: jenkins
-          port: 80
-      middlewares:
-        - name: default-ip-whitelist-plus-github-local@kubernetescrd
-        - name: jenkins-strict-transport-security@kubernetescrd
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
-metadata:
-  name: jenkins-ingressroute-auth-tls
-  namespace: jenkins
-spec:
-  entryPoints:
     - websecure
   routes:
     - match: Host(`kenjins.tinker.haus`)
@@ -142,12 +126,6 @@ spec:
       middlewares:
         - name: default-ip-whitelist-plus-github-local@kubernetescrd
         - name: jenkins-strict-transport-security@kubernetescrd
-  tls:
-    certResolver: myresolver
-    domains:
-    - main: "tinker.haus"
-      sans:
-      - "*.tinker.haus"
 
 ---
 apiVersion: traefik.containo.us/v1alpha1

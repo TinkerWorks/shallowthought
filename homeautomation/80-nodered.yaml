@@ -47,36 +47,12 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: nodered-websecure
-  namespace: homeautomation
-spec:
-  entryPoints:
-    - websecure
-  routes:
-    - match: Host(`nodered.tinker.haus`)
-      kind: Rule
-      services:
-        - name: nodered
-          port: 80
-      middlewares:
-        - name: default-ip-whitelist-local@kubernetescrd
-  tls:
-    certResolver: myresolver
-    domains:
-    - main: "tinker.haus"
-      sans:
-      - "*.tinker.haus"
-
-
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
-metadata:
-  name: nodered-web
+  name: nodered
   namespace: homeautomation
 spec:
   entryPoints:
     - web
+    - websecure
   routes:
     - match: Host(`nodered.tinker.haus`)
       kind: Rule

@@ -27,7 +27,7 @@ spec:
       volumes:
         - name: tasmota
           hostPath:
-            path: /jenkins/tasmota
+            path: /servers/tasmota
             type: DirectoryOrCreate
 
 ---

@@ -36,7 +36,7 @@ spec:
       - name: nginx-config
         hostPath:
           path: "/var/srv/nextcloud/nginx/nginx.conf"
-          type: File
+          type: FileOrCreate
       - name: nextcloud
         hostPath:
           path: "/var/srv/nextcloud/html"
@@ -60,29 +60,11 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: web-frontend-ingressroute-auth
+  name: nextcloud-web-frontend
   namespace: nextcloud
 spec:
   entryPoints:
     - web
-  routes:
-    - match: Host(`nextcloud.tinker.haus`)
-      kind: Rule
-      services:
-        - name: web-frontend
-          port: 80
-      middlewares:
-        - name: nextcloud-strict-transport-security@kubernetescrd
-        - name: nextcloud-nextcloud-redirect@kubernetescrd
-
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
-metadata:
-  name: websecure-frontend-ingressroute-auth
-  namespace: nextcloud
-spec:
-  entryPoints:
     - websecure
   routes:
     - match: Host(`nextcloud.tinker.haus`)
@@ -93,9 +75,3 @@ spec:
       middlewares:
         - name: nextcloud-strict-transport-security@kubernetescrd
         - name: nextcloud-nextcloud-redirect@kubernetescrd
-  tls:
-    certResolver: myresolver
-    domains:
-    - main: "tinker.haus"
-      sans:
-      - "*.tinker.haus"

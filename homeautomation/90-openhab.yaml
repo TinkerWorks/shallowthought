@@ -64,35 +64,12 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: openhab-websecure
-  namespace: homeautomation
-spec:
-  entryPoints:
-    - websecure
-  routes:
-    - match: Host(`openhab.tinker.haus`)
-      kind: Rule
-      services:
-        - name: openhab
-          port: 80
-      middlewares:
-        - name: default-ip-whitelist-local@kubernetescrd
-  tls:
-    certResolver: myresolver
-    domains:
-    - main: "tinker.haus"
-      sans:
-      - "*.tinker.haus"
-
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
-metadata:
-  name: openhab-web
+  name: openhab
   namespace: homeautomation
 spec:
   entryPoints:
     - web
+    - websecure
   routes:
     - match: Host(`openhab.tinker.haus`)
       kind: Rule
