@@ -34,6 +34,14 @@ spec:
         port: 51413
         exposedPort: 51413
         protocol: TCP
+      influxdb:
+        port: 8086
+        exposedPort: 8086
+        protocol: TCP
+      influxdbudp:
+        port: 8089
+        exposedPort: 8089
+        protocol: UDP
       websecure:
         tls:
           certResolver: le
