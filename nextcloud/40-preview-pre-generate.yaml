@@ -21,7 +21,9 @@ spec:
       - name: preview-pre-generate
         image: registry.tinker.haus/nextcloud # nextcloud:fpm
         imagePullPolicy: Always
-        command: ['sh', '-c', "echo '* * * * * /var/www/html/occ preview:pre-generate -vvvv' > /var/spool/cron/crontabs/www-data && /cron.sh"]
+        command: ['sh', '-c', "echo '* * * * * /var/www/html/occ preview:pre-generate -vvvv' >> /var/spool/cron/crontabs/www-data && \
+                               echo '* * * * * /var/www/html/occ app:update --all -n -vvvv ' >> /var/spool/cron/crontabs/www-data && \
+                               /cron.sh"]
         env:
         - name: MYSQL_HOST
           value: db
