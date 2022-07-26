@@ -77,3 +77,6 @@ spec:
       services:
         - name: api@internal
           kind: TraefikService
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+        - name: default-redirect-to-https@kubernetescrd
