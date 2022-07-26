@@ -13,6 +13,8 @@ spec:
     logs:
       access:
         enabled: true
+    tracing: {}
+    accessLog: {}
     metrics:
       influxdb:
         address: influxdb.tinker.haus:8089
@@ -40,6 +42,7 @@ spec:
         protocol: TCP
       influxdbudp:
         port: 8089
+        expose: true
         exposedPort: 8089
         protocol: UDP
       websecure:
