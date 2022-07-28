@@ -1,60 +1,108 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: CronJob
 metadata:
-  labels:
-    app: cron
   name: cron
   namespace: nextcloud
 spec:
-  replicas: 1
-  strategy:
-    type: Recreate
-  selector:
-    matchLabels:
-      app: cron
-  template:
-    metadata:
-      labels:
-        app: cron
+  schedule: "* * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
     spec:
-      containers:
-      - name: cron
-        image: registry.tinker.haus/nextcloud
-        imagePullPolicy: Always
-        command: ["/cron.sh"]
-        env:
-        - name: MYSQL_HOST
-          value: db
-        - name: MYSQL_DATABASE
-          value: nextcloud
-        - name: MYSQL_PASSWORD
-          value: nextcloud
-        - name: MYSQL_USER
-          value: nextcloud
-        - name: MYSQL_ROOT_PASSWORD
-          value: nextcloud
-        - name: REDIS_HOST
-          value: redis
-        volumeMounts:
-        - name: nextcloud
-          mountPath: /var/www/html
-        - name: data
-          mountPath: /data
-        - name: cache
-          mountPath: /cache
-        - name: storage
-          mountPath: /home-storage
-      restartPolicy: Always
-      volumes:
-      - name: nextcloud
-        hostPath:
-          path: "/var/srv/nextcloud/html"
-      - name: data
-        hostPath:
-          path: "/servers/nextcloud/data"
-      - name: cache
-        hostPath:
-          path: "/var/srv/nextcloud/cache"
-      - name: storage
-        hostPath:
-          path: "/home-storage"
+      template:
+        spec:
+         containers:
+         - name: cron-php
+           image: registry.tinker.haus/nextcloud
+           securityContext:
+             runAsUser: 33
+           command: ["php", "-f", "/var/www/html/cron.php"]
+           env:
+           - name: MYSQL_HOST
+             value: db
+           - name: MYSQL_DATABASE
+             value: nextcloud
+           - name: MYSQL_PASSWORD
+             value: nextcloud
+           - name: MYSQL_USER
+             value: nextcloud
+           - name: MYSQL_ROOT_PASSWORD
+             value: nextcloud
+           - name: REDIS_HOST
+             value: redis
+           volumeMounts:
+           - name: nextcloud
+             mountPath: /var/www/html
+           - name: data
+             mountPath: /data
+           - name: cache
+             mountPath: /cache
+           - name: storage
+             mountPath: /home-storage
+         - name: preview-pre-generate
+           image: registry.tinker.haus/nextcloud
+           securityContext:
+             runAsUser: 33
+           command: ["/var/www/html/occ", "preview:pre-generate","-vvvv"]
+           env:
+           - name: MYSQL_HOST
+             value: db
+           - name: MYSQL_DATABASE
+             value: nextcloud
+           - name: MYSQL_PASSWORD
+             value: nextcloud
+           - name: MYSQL_USER
+             value: nextcloud
+           - name: MYSQL_ROOT_PASSWORD
+             value: nextcloud
+           - name: REDIS_HOST
+             value: redis
+           volumeMounts:
+           - name: nextcloud
+             mountPath: /var/www/html
+           - name: data
+             mountPath: /data
+           - name: cache
+             mountPath: /cache
+           - name: storage
+             mountPath: /home-storage
+         - name: app-update
+           image: registry.tinker.haus/nextcloud
+           securityContext:
+             runAsUser: 33
+           command: ["/var/www/html/occ", "app:update", "--all", "-n", "-vvvv"]
+           env:
+           - name: MYSQL_HOST
+             value: db
+           - name: MYSQL_DATABASE
+             value: nextcloud
+           - name: MYSQL_PASSWORD
+             value: nextcloud
+           - name: MYSQL_USER
+             value: nextcloud
+           - name: MYSQL_ROOT_PASSWORD
+             value: nextcloud
+           - name: REDIS_HOST
+             value: redis
+           volumeMounts:
+           - name: nextcloud
+             mountPath: /var/www/html
+           - name: data
+             mountPath: /data
+           - name: cache
+             mountPath: /cache
+           - name: storage
+             mountPath: /home-storage
+         restartPolicy: OnFailure
+         volumes:
+         - name: nextcloud
+           hostPath:
+             path: "/var/srv/nextcloud/html"
+         - name: data
+           hostPath:
+             path: "/servers/nextcloud/data"
+         - name: cache
+           hostPath:
+             path: "/var/srv/nextcloud/cache"
+         - name: storage
+           hostPath:
+             path: "/home-storage"
