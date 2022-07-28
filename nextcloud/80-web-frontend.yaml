@@ -75,3 +75,26 @@ spec:
       middlewares:
         - name: nextcloud-strict-transport-security@kubernetescrd
         - name: nextcloud-nextcloud-redirect@kubernetescrd
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: nextcloud-redirect
+  namespace: nextcloud
+spec:
+  redirectRegex:
+    regex: /.well-known/(card|cal)dav
+    replacement: /remote.php/dav/
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strict-transport-security
+  namespace: nextcloud
+spec:
+  headers:
+    stsSeconds: 15552000
+    customFrameOptionsValue: SAMEORIGIN
+    referrerPolicy: no-referrer
