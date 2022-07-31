@@ -36,6 +36,7 @@ spec:
         port: 51413
         exposedPort: 51413
         protocol: TCP
+        expose: true
       influxdb:
         port: 8086
         exposedPort: 8086
