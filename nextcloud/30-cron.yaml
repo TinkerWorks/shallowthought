@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: cron
+  name: cron-minutely
   namespace: nextcloud
 spec:
   schedule: "* * * * *"
@@ -70,6 +70,62 @@ spec:
            securityContext:
              runAsUser: 33
            command: ["/var/www/html/occ", "app:update", "--all", "-n", "-vvvv"]
+           env:
+           - name: MYSQL_HOST
+             value: db
+           - name: MYSQL_DATABASE
+             value: nextcloud
+           - name: MYSQL_PASSWORD
+             value: nextcloud
+           - name: MYSQL_USER
+             value: nextcloud
+           - name: MYSQL_ROOT_PASSWORD
+             value: nextcloud
+           - name: REDIS_HOST
+             value: redis
+           volumeMounts:
+           - name: nextcloud
+             mountPath: /var/www/html
+           - name: data
+             mountPath: /data
+           - name: cache
+             mountPath: /cache
+           - name: storage
+             mountPath: /home-storage
+         restartPolicy: OnFailure
+         volumes:
+         - name: nextcloud
+           hostPath:
+             path: "/var/srv/nextcloud/html"
+         - name: data
+           hostPath:
+             path: "/servers/nextcloud/data"
+         - name: cache
+           hostPath:
+             path: "/var/srv/nextcloud/cache"
+         - name: storage
+           hostPath:
+             path: "/home-storage"
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cron-daily
+  namespace: nextcloud
+spec:
+  schedule: "0 4 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+         containers:
+         - name: cron-php
+           image: registry.tinker.haus/nextcloud
+           securityContext:
+             runAsUser: 33
+           command: ["/var/www/html/occ", "preview:generate-all","-vvv"]
            env:
            - name: MYSQL_HOST
              value: db
