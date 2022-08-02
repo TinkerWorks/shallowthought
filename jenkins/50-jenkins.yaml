@@ -86,8 +86,7 @@ spec:
           operator: In
           values:
           - shallowthought
-          - shallowtrial
-         
+
 ---
 apiVersion: v1
 kind: Service
