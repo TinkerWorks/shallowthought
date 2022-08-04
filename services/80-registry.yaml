@@ -13,6 +13,7 @@ spec:
       labels:
         app: registry
     spec:
+      priorityClassName: system-cluster-critical
       containers:
       - name: registry
         image: docker-cache.tinker.haus/library/registry

@@ -13,6 +13,7 @@ spec:
       labels:
         app: docker-cache
     spec:
+      priorityClassName: system-cluster-critical
       containers:
       - name: docker-cache
         image: docker.io/library/registry
