@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: valheim-hh
+  name: valheim-best-seed
   namespace: games
 spec:
   selector:
     matchLabels:
-      app: valheim-hh
+      app: valheim-best-seed
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
@@ -14,31 +14,31 @@ spec:
   template:
     metadata:
       labels:
-        app: valheim-hh
+        app: valheim-best-seed
     spec:
       hostNetwork: true
       containers:
-      - name: valheim-hh
+      - name: valheim-best-seed
         image: docker-cache.tinker.haus/lloesche/valheim-server
         imagePullPolicy: Always
         ports:
-        - containerPort: 12456
+        - containerPort: 2456
           protocol: UDP
-        - containerPort: 12457
+        - containerPort: 2457
           protocol: UDP
-        - containerPort: 12458
+        - containerPort: 2458
           protocol: UDP
         env:
         - name: WORLD_NAME
-          value: "OmicronPersei8"
+          value: "BestWorld"
         - name: SERVER_NAME
-          value: "OmicronPersei8"
+          value: "BestServer"
         - name: SERVER_PASS
           value: "%%VALHEIM_PASS%%"
         - name: SERVER_PUBLIC
           value: "true"
         - name: SERVER_PORT
-          value: "12456"
+          value: "2456"
         - name: TZ
           value: "Europe/Bucharest"
         volumeMounts:
@@ -49,9 +49,9 @@ spec:
       volumes:
         - name: config
           hostPath:
-            path: /var/srv/games/valheim-hh/config
+            path: /var/srv/games/valheim-best-seed/config
             type: DirectoryOrCreate
         - name: server
           hostPath:
-            path: /var/srv/games/valheim-hh/server
+            path: /var/srv/games/valheim-best-seed/server
             type: DirectoryOrCreate
