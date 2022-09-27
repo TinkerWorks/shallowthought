@@ -96,4 +96,3 @@ spec:
           port: 80
       middlewares:
         - name: default-ip-whitelist-local@kubernetescrd
-        - name: nextcloud-nextcloud-redirect@kubernetescrd
