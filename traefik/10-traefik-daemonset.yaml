@@ -29,7 +29,6 @@ spec:
         args:
             - --log.level=INFO
             - --pilot.dashboard=false
-            - --api.insecure
             - --api.dashboard
             - --accesslog
             - --metrics=true
@@ -42,15 +41,13 @@ spec:
             - --entrypoints.websecure.http.tls.certResolver=myresolver
             - --entrypoints.websecure.http.tls.domains[0].main=tinker.haus
             - --entrypoints.influxdb.Address=:8086
-            - --entrypoints.openhab.Address=:28080
             - --entrypoints.influxdbudp.Address=:8089/udp
             - --entrypoints.traefik.Address=:30002
             - --entrypoints.transmissiontcp.Address=:51413
-            - --entrypoints.transmissionudp.Address=:51413/udp
-            - --providers.kubernetescrd
             - --certificatesResolvers.myresolver.acme.dnsChallenge.provider=cloudflare
             - --certificatesResolvers.myresolver.acme.email=alex.sever.h@gmail.com
             - --certificatesResolvers.myresolver.acme.storage=/data/acme.json
+            - --providers.kubernetescrd
             - --providers.kubernetescrd.allowCrossNamespace=true
         ports:
         - containerPort: 80
