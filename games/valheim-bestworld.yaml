@@ -34,9 +34,9 @@ spec:
         - name: SERVER_NAME
           value: "BestServer"
         - name: SERVER_PASS
-          value: "%%VALHEIM_PASS%%"
+          value: ""
         - name: SERVER_PUBLIC
-          value: "true"
+          value: "false"
         - name: SERVER_PORT
           value: "2456"
         - name: TZ
