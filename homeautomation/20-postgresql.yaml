@@ -16,7 +16,7 @@ spec:
       containers:
       - name: postgresql
         image: docker-cache.tinker.haus/library/postgres:latest
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         env:
         - name: POSTGRES_PASSWORD_FILE
           value: /var/lib/postgresql/password

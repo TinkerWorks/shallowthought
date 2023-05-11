@@ -16,7 +16,7 @@ spec:
       containers:
       - name: rhasspy
         image: docker-cache.tinker.haus/rhasspy/rhasspy
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         args: ["--profile", "en"]
         ports:
         - name: webui
@@ -57,7 +57,7 @@ spec:
     app: rhasspy
 
 ---
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: rhasspy

@@ -16,7 +16,7 @@ spec:
       containers:
       - name: nodered
         image: docker-cache.tinker.haus/nodered/node-red
-        imagePullPolicy: Always
+        #imagePullPolicy: Always
         ports:
         - containerPort: 1880
         volumeMounts:
@@ -44,7 +44,7 @@ spec:
     app: nodered
 
 ---
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: nodered
