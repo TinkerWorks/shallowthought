@@ -47,6 +47,7 @@ spec:
             - --entrypoints.influxdbudp.Address=:8089/udp
             - --entrypoints.traefik.Address=:30002
             - --entrypoints.transmissiontcp.Address=:51413
+            - --entrypoints.transmissionudp.Address=:51413/udp
             - --certificatesResolvers.myresolver.acme.dnsChallenge.provider=cloudflare
             - --certificatesResolvers.myresolver.acme.email=alex.sever.h@gmail.com
             - --certificatesResolvers.myresolver.acme.storage=/data/acme.json
