@@ -22,25 +22,34 @@ spec:
         image: docker-cache.tinker.haus/lloesche/valheim-server
         imagePullPolicy: Always
         ports:
-        - containerPort: 2456
+        - name: statusport
+          containerPort: 22458
+          protocol: TCP
+        - name: gameport
+          containerPort: 22456
           protocol: UDP
-        - containerPort: 2457
-          protocol: UDP
-        - containerPort: 2458
+        - name: queryport
+          containerPort: 22457
           protocol: UDP
         env:
-        - name: WORLD_NAME
-          value: "BestWorld"
         - name: SERVER_NAME
           value: "BestServer"
+        - name: SERVER_PORT
+          value: "22456"
+        - name: WORLD_NAME
+          value: "BestWorld"
         - name: SERVER_PASS
           value: ""
         - name: SERVER_PUBLIC
           value: "false"
-        - name: SERVER_PORT
-          value: "2456"
         - name: TZ
           value: "Europe/Bucharest"
+        - name: BACKUPS_MAX_AGE
+          value: "14"
+        - name: STATUS_HTTP
+          value: "true"
+        - name: STATUS_HTTP_PORT
+          value: "22458"
         volumeMounts:
           - name: config
             mountPath: /config
