@@ -155,6 +155,8 @@ spec:
   entryPoints:
     - web
     - websecure
+    - externalweb
+    - externalwebsecure
   routes:
     - match: Host(`kenjins.tinker.haus`)
       kind: Rule

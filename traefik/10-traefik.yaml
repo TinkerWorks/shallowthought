@@ -43,6 +43,10 @@ spec:
             - --entrypoints.websecure.Address=:443
             - --entrypoints.websecure.http.tls.certResolver=myresolver
             - --entrypoints.websecure.http.tls.domains[0].main=tinker.haus
+            - --entrypoints.externalweb.Address=:81
+            - --entrypoints.externalwebsecure.Address=:444
+            - --entrypoints.externalwebsecure.http.tls.certResolver=myresolver
+            - --entrypoints.externalwebsecure.http.tls.domains[0].main=tinker.haus
             - --entrypoints.influxdb.Address=:8086
             - --entrypoints.influxdbudp.Address=:8089/udp
             - --entrypoints.traefik.Address=:30002

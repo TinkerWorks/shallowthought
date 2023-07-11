@@ -66,6 +66,8 @@ spec:
   entryPoints:
     - web
     - websecure
+    - externalweb
+    - externalwebsecure
   routes:
     - match: Host(`nextcloud.tinker.haus`)
       kind: Rule
