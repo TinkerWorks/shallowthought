@@ -150,13 +150,19 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: jenkinsjenkins
+  name: jenkins
+  namespace: jenkins
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`kenjins.tinker.haus`)
       kind: Rule
       services:
         - name: jenkins
           port: 80
       middlewares:
-        - name: default-ip-whitelist-plus-github-local@kubernetescrd
         - name: jenkins-strict-transport-security@kubernetescrd
 
 ---

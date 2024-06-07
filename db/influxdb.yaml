@@ -81,5 +81,4 @@ spec:
         - name: influxdb
           port: 8086
       middlewares:
-        - name: default-ip-whitelist-local@kubernetescrd
         - name: default-redirect-to-https@kubernetescrd

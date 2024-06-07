@@ -1,0 +1,60 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    ports:
+      websecure:
+        tls:
+          certResolver: letsencrypt
+          domains:
+            - main: "tinker.haus"
+              sans:
+                - "*.tinker.haus"
+      e-web: 
+        port: 10080
+        expose: true
+        exposedPort: 10080
+      e-websecure: 
+        port: 10443
+        expose: true  
+        exposedPort: 10443
+      influxdb:
+        port: 8086
+        expose: true
+        exposePort: 8086
+    logs:
+      general:
+        level: DEBUG
+    certResolvers:
+      letsencrypt:
+        dnsChallenge:
+          provider: cloudflare
+        storage: /datalocal/acme.json
+        email: "alex.sever.h@gmail.com"
+    providers:
+      kubernetesCRD:
+        allowCrossNamespace: true
+    env:
+      - name: CF_API_EMAIL
+        valueFrom:
+          secretKeyRef:
+            key: email
+            name: cloudflare-api-credentials
+      - name: CF_API_KEY
+        valueFrom:
+          secretKeyRef:
+            key: apiKey
+            name: cloudflare-api-credentials
+    deployment:
+      additionalVolumes: 
+        - name: datalocal
+          hostPath:
+            path: /var/srv/traefik/traefik/data
+    additionalVolumeMounts: 
+      - name: datalocal
+        mountPath: "/datalocal" 
+        
+     

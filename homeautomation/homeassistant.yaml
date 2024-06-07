@@ -132,5 +132,3 @@ spec:
       services:
         - name: homeassistant
           port: 80
-      middlewares:
-        - name: default-ip-whitelist-local@kubernetescrd

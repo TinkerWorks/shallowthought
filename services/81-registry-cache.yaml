@@ -96,8 +96,6 @@ spec:
       services:
         - name: docker-cache
           port: 80
-      middlewares:
-        - name: default-ip-whitelist-local@kubernetescrd
 
 ---
 apiVersion: scheduling.k8s.io/v1
