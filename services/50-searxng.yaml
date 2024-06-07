@@ -58,14 +58,12 @@ spec:
   entryPoints:
     - web
     - websecure
-    - externalweb
-    - externalwebsecure
+    - e-web
+    - e-websecure
   routes:
     - match: Host(`searxng.tinker.haus`)
       kind: Rule
       services:
         - name: searxng
           port: 80
-      middlewares:
-        - name: default-ip-whitelist-local@kubernetescrd
-        - name: default-redirect-to-https@kubernetescrd
+

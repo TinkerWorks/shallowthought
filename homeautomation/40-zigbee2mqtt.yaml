@@ -73,6 +73,4 @@ spec:
       services:
         - name: zigbee2mqtt
           port: 80
-      middlewares:
-        - name: default-ip-whitelist-local@kubernetescrd
-        - name: default-redirect-to-https@kubernetescrd
+

@@ -66,6 +66,3 @@ spec:
       services:
         - name: mealie
           port: 80
-      middlewares:
-        - name: default-ip-whitelist-local@kubernetescrd
-        - name: default-redirect-to-https@kubernetescrd
