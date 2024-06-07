@@ -6,9 +6,6 @@ metadata:
   name: app
   namespace: nextcloud
 spec:
-  replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: app
@@ -23,7 +20,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: MYSQL_HOST
-          value: db
+          value: mariadb.db
         - name: MYSQL_DATABASE
           value: nextcloud
         - name: MYSQL_PASSWORD
@@ -47,8 +44,6 @@ spec:
           mountPath: /usr/local/etc/php/conf.d/zzz-custom.ini
         - name: data
           mountPath: /data
-        - name: cache
-          mountPath: /cache
         - name: storage
           mountPath: /home-storage
       restartPolicy: Always
@@ -59,12 +54,9 @@ spec:
       - name: phpini
         hostPath:
           path: "/var/srv/nextcloud/php.ini"
-      - name: cache
-        hostPath:
-          path: "/var/srv/nextcloud/cache"
       - name: data
         hostPath:
-          path: "/servers/nextcloud/data"
+          path: "/var/srv/nextcloud/data"
       - name: storage
         hostPath:
           path: "/home-storage"

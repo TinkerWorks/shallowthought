@@ -26,21 +26,19 @@ spec:
       priorityClassName: system-node-critical
       containers:
       - name: traefik
-        image: library/traefik:latest
+        image: library/traefik:v2.11.2
         imagePullPolicy: Always
         args:
             - --log.level=INFO
-            - --pilot.dashboard=false
             - --api.dashboard=true
             - --api.insecure=true
             - --accesslog
-            - --metrics=true
-            - --metrics.influxdb=true
-            - --metrics.influxdb.address=influxdb:8086
-            - --metrics.influxdb.protocol=http
-            - --metrics.influxdb.database=traefik
+            - --providers.kubernetescrd
+            - --providers.kubernetescrd.allowCrossNamespace=true
             - --entrypoints.web.Address=:80
+            - --entrypoints.web.transport.respondingTimeouts.readTimeout=0
             - --entrypoints.websecure.Address=:443
+            - --entrypoints.websecure.transport.respondingTimeouts.readTimeout=0
             - --entrypoints.websecure.http.tls.certResolver=myresolver
             - --entrypoints.websecure.http.tls.domains[0].main=tinker.haus
             - --entrypoints.externalweb.Address=:81
@@ -48,31 +46,19 @@ spec:
             - --entrypoints.externalwebsecure.http.tls.certResolver=myresolver
             - --entrypoints.externalwebsecure.http.tls.domains[0].main=tinker.haus
             - --entrypoints.influxdb.Address=:8086
+            - --entrypoints.influxdb.transport.respondingTimeouts.readTimeout=0
             - --entrypoints.influxdbudp.Address=:8089/udp
             - --entrypoints.traefik.Address=:30002
             - --entrypoints.transmissiontcp.Address=:51413
             - --entrypoints.transmissionudp.Address=:51413/udp
+            - --entrypoints.postgresql.Address=:5432
+            - --entrypoints.postgresql.transport.respondingTimeouts.readTimeout=0
+            - --entrypoints.mariadb.Address=:3306
+            - --entrypoints.mqtt.Address=:1883
+            - --entrypoints.mqtt.transport.respondingTimeouts.readTimeout=0
             - --certificatesResolvers.myresolver.acme.dnsChallenge.provider=cloudflare
             - --certificatesResolvers.myresolver.acme.email=alex.sever.h@gmail.com
             - --certificatesResolvers.myresolver.acme.storage=/data/acme.json
-            - --providers.kubernetescrd
-            - --providers.kubernetescrd.allowCrossNamespace=true
-        ports:
-        - containerPort: 80
-          hostPort: 80
-        - containerPort: 443
-          hostPort: 443
-        - containerPort: 30002
-          hostPort: 30002
-        - containerPort: 8086
-          hostPort: 8086
-        - containerPort: 28080
-          hostPort: 28080
-        - containerPort: 51413
-          hostPort: 51413
-        - containerPort: 51413
-          hostPort: 51413
-          protocol: UDP
         env:
         - name: TZ
           value: "Europe/Bucharest"

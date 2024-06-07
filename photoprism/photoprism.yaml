@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: photoprism
+  namespace: photoprism
+spec:
+  selector:
+    matchLabels:
+      app: photoprism
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: photoprism
+    spec:
+      containers:
+      - name: photoprism
+        image: docker-cache.tinker.haus/photoprism/photoprism
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 2342
+        env:
+        - name: PHOTOPRISM_UPLOAD_NSFW
+          value: "true"
+        - name: PHOTOPRISM_ADMIN_PASSWORD
+          value: "insecure"
+        - name: PHOTOPRISM_READONLY
+          value: "true"
+        volumeMounts:
+          - name: photoprism-storage
+            mountPath: /photoprism/storage
+          - name: pictures
+            mountPath: /photoprism/originals
+      volumes:
+        - name: photoprism-storage
+          hostPath:
+            path: /var/srv/photoprism/storage
+            type: DirectoryOrCreate
+        - name: pictures
+          hostPath:
+            path: /home-storage/shared/Pictures
+            type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: photoprism
+  namespace: photoprism
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 2342
+  type: NodePort
+  selector:
+    app: photoprism
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: photoprism
+  namespace: photoprism
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`photoprism.tinker.haus`)
+      kind: Rule
+      services:
+        - name: photoprism
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+        - name: default-redirect-to-https@kubernetescrd

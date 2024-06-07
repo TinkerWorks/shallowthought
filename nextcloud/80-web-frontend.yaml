@@ -7,39 +7,53 @@ spec:
   selector:
     matchLabels:
       app: web-frontend
-  replicas: 1
   template:
     metadata:
       labels:
         app: web-frontend
     spec:
+      initContainers:
+        - name: init-config
+          securityContext:
+            runAsUser: 0
+          image: docker-cache.tinker.haus/curlimages/curl
+          command:
+            [
+              "curl",
+              "-o",
+              "/etc/nginx/nginx.conf",
+              "https://raw.githubusercontent.com/nextcloud/docker/master/.examples/docker-compose/insecure/mariadb/fpm/web/nginx.conf",
+            ]
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
       containers:
-      - name: web-frontend
-        image: docker-cache.tinker.haus/library/nginx
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
-        env:
-        - name: PUID
-          value: "2001"
-        - name: PGID
-          value: "2000"
-        - name: TZ
-          value: "Europe/Bucharest"
-        volumeMounts:
-        - name: nginx-config
-          mountPath: /etc/nginx/nginx.conf
-        - name: nextcloud
-          mountPath: /var/www/html
-          readOnly: true
+        - name: web-frontend
+          image: docker-cache.tinker.haus/library/nginx
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: PUID
+              value: "2001"
+            - name: PGID
+              value: "2000"
+            - name: TZ
+              value: "Europe/Bucharest"
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+            - name: nextcloud
+              mountPath: /var/www/html
+              readOnly: true
       volumes:
-      - name: nginx-config
-        hostPath:
-          path: "/var/srv/nextcloud/nginx/nginx.conf"
-          type: FileOrCreate
-      - name: nextcloud
-        hostPath:
-          path: "/var/srv/nextcloud/html"
+        - name: nginx-config
+          hostPath:
+            path: "/var/srv/nextcloud/nginx/nginx.conf"
+            type: FileOrCreate
+        - name: nextcloud
+          hostPath:
+            path: "/var/srv/nextcloud/html"
 
 ---
 apiVersion: v1
@@ -49,9 +63,9 @@ metadata:
   namespace: nextcloud
 spec:
   ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 80
+    - port: 80
+      protocol: TCP
+      targetPort: 80
   type: NodePort
   selector:
     app: web-frontend
@@ -76,18 +90,30 @@ spec:
           port: 80
       middlewares:
         - name: nextcloud-strict-transport-security@kubernetescrd
-        - name: nextcloud-nextcloud-redirect@kubernetescrd
+        - name: nextcloud-nextcloud-redirect-https@kubernetescrd
+        - name: nextcloud-nextcloud-redirect-wk@kubernetescrd
 
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: nextcloud-redirect
+  name: nextcloud-redirect-https
+  namespace: nextcloud
+spec:
+  redirectScheme:
+    permanent: true
+    scheme: https
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: nextcloud-redirect-wk
   namespace: nextcloud
 spec:
   redirectRegex:
-    regex: /.well-known/(card|cal)dav
-    replacement: /remote.php/dav/
+    regex: https://(.*)/.well-known/(card|cal)dav
+    replacement: https://$1/remote.php/dav/
 
 ---
 apiVersion: traefik.io/v1alpha1

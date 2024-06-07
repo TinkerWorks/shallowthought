@@ -1,64 +1,71 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tasmota
+  name: searxng
   namespace: services
 spec:
   selector:
     matchLabels:
-      app: tasmota
+      app: searxng
   replicas: 1
   template:
     metadata:
       labels:
-        app: tasmota
+        app: searxng
     spec:
       containers:
-      - name: tasmota
-        image: registry.tinker.haus/pushgetserver
+      - name: searxng
+        image: docker-cache.tinker.haus/searxng/searxng
         imagePullPolicy: Always
-        workingDir: /tasmota
         ports:
-        - name: main
-          containerPort: 8000
+        - containerPort: 8080
+        env:
+        - name: INSTANCE_NAME
+          value: "tinker.haus"
+        - name: BASE_URL
+          value: "http://searxng.tinker.haus"
         volumeMounts:
-          - name: tasmota
-            mountPath: /tasmota
+          - name: repos
+            mountPath: /etc/searxng
       volumes:
-        - name: tasmota
+        - name: repos
           hostPath:
-            path: /var/srv/services/tasmota
+            path: /var/srv/services/searxng
             type: DirectoryOrCreate
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: tasmota
+  name: searxng
   namespace: services
 spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: 8000
+    targetPort: 8080
   type: NodePort
   selector:
-    app: tasmota
+    app: searxng
 
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: tasmota-ingressroute-auth
+  name: searxng
   namespace: services
 spec:
   entryPoints:
     - web
+    - websecure
+    - externalweb
+    - externalwebsecure
   routes:
-    - match: Host(`tasmota.tinker.haus`)
+    - match: Host(`searxng.tinker.haus`)
       kind: Rule
       services:
-        - name: tasmota
+        - name: searxng
           port: 80
       middlewares:
         - name: default-ip-whitelist-local@kubernetescrd
+        - name: default-redirect-to-https@kubernetescrd

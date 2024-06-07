@@ -2,38 +2,38 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: redis
-  name: redis
+    app: imaginary
+  name: imaginary
   namespace: nextcloud
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: redis
+      app: imaginary
   template:
     metadata:
       labels:
-        app: redis
+        app: imaginary
     spec:
       containers:
-        - name: redis
-          image: docker-cache.tinker.haus/library/redis
+        - name: imaginary
+          image: docker-cache.tinker.haus/nextcloud/aio-imaginary:latest
           imagePullPolicy: Always
           env:
             - name: TZ
               value: Europe/Bucharest
           ports:
-            - containerPort: 6379
+            - containerPort: 9000
       restartPolicy: Always
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis
+  name: imaginary
   namespace: nextcloud
 spec:
   ports:
-    - port: 6379
+    - port: 9000
   selector:
-    app: redis
+    app: imaginary

@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: postgresql
+  name: postgresql
+  namespace: db
+spec:
+  serviceName: postgresql
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+      - name: postgresql
+        image: docker-cache.tinker.haus/library/postgres:latest
+        #image: docker-cache.tinker.haus/pgautoupgrade/pgautoupgrade
+        args: ["-c", "max_connections=1000"]
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5432
+          protocol: TCP
+
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgresql
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgresql
+              key: password
+        volumeMounts:
+          - name: db
+            mountPath: /var/lib/postgresql/data
+          - name: shm
+            mountPath: /dev/shm
+      - name: pgadmin
+        image: docker-cache.tinker.haus/dpage/pgadmin4
+        imagePullPolicy: Always
+        env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: admin@tinker.haus
+        - name: PGADMIN_DEFAULT_PASSWORD
+          value: password
+        - name: DEFAULT_SERVER
+          value: postgresql
+        ports:
+        - containerPort: 80
+          protocol: TCP
+      volumes:
+        - name: db
+          hostPath:
+            path: /var/srv/db/postgresql/data
+            type: DirectoryOrCreate
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 5120Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: db
+spec:
+  ports:
+  - name: "pgadmin"
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: "postgresql"
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+    
+  type: NodePort
+  selector:
+    app: postgresql
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: postgresql
+  namespace: db
+spec:
+  entryPoints:
+    - postgresql
+  routes:
+  - match: HostSNI(`*`)
+    services:
+    - name: postgresql
+      port: 5432
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: pgadmin
+  namespace: db
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`pgadmin.tinker.haus`)
+      kind: Rule
+      services:
+        - name: postgresql
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+        - name: default-redirect-to-https@kubernetescrd

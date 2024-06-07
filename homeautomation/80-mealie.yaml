@@ -1,77 +1,70 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
-  name: zigbee2mqtt
+  name: mealie
   namespace: homeautomation
 spec:
-  serviceName: zigbee2mqtt
   selector:
     matchLabels:
-      app: zigbee2mqtt
+      app: mealie
+  replicas: 1
   template:
     metadata:
       labels:
-        app: zigbee2mqtt
+        app: mealie
     spec:
       containers:
-      - name: zigbee2mqtt
-        image: docker-cache.tinker.haus/koenkk/zigbee2mqtt
+      - name: mealie
+        image: docker-cache.tinker.haus/hkotel/mealie
         imagePullPolicy: Always
-        ports:
-        - name: webui
-          containerPort: 8123
         env:
+          - name: ALLOW_SIGNUP
+            value: "true"
           - name: TZ
             value: "Europe/Bucharest"
-        securityContext:
-          privileged: true
-          capabilities:
-            add: ["NET_RAW"]
+          - name: BASE_URL
+            value: "https://mealie.tinker.haus"
+        ports:
+          - containerPort: 9000
         volumeMounts:
           - name: data
             mountPath: /app/data
-          - name: cp210x
-            mountPath: /dev/cp210x
       volumes:
         - name: data
           hostPath:
-            path: /var/srv/homeautomation/zigbee2mqtt/data
+            path: /var/srv/homeautomation/mealie/app/data
             type: DirectoryOrCreate
-        - name: cp210x
-          hostPath:
-            path: /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_9a073488b729ec11a6edbd9c40c9ce8d-if00-port0 #TODO: This better
-            type: CharDevice
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: zigbee2mqtt
+  name: mealie
   namespace: homeautomation
 spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: 8080
+    targetPort: 9000
   type: NodePort
   selector:
-    app: zigbee2mqtt
+    app: mealie
 
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: zigbee2mqtt
+  name: mealie
   namespace: homeautomation
 spec:
   entryPoints:
     - web
     - websecure
   routes:
-    - match: Host(`zigbee2mqtt.tinker.haus`)
+    - match: Host(`mealie.tinker.haus`)
       kind: Rule
       services:
-        - name: zigbee2mqtt
+        - name: mealie
           port: 80
       middlewares:
         - name: default-ip-whitelist-local@kubernetescrd

@@ -5,7 +5,6 @@ metadata:
   namespace: nextcloud
 spec:
   schedule: "*/5 * * * *"
-  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       template:
@@ -16,26 +15,7 @@ spec:
            imagePullPolicy: Always
            securityContext:
              runAsUser: 33
-           command: ["php", "-f", "/var/www/html/cron.php"]
-           env:
-           - name: MYSQL_HOST
-             value: db
-           - name: MYSQL_DATABASE
-             value: nextcloud
-           - name: MYSQL_PASSWORD
-             value: nextcloud
-           - name: MYSQL_USER
-             value: nextcloud
-           - name: MYSQL_ROOT_PASSWORD
-             value: nextcloud
-           - name: REDIS_HOST
-             value: redis
-           - name: NEXTCLOUD_DATA_DIR
-             value: "/data"
-           - name: PHP_MEMORY_LIMIT
-             value: "3072M"
-           - name: PHP_UPLOAD_LIMIT
-             value: "0"
+           command: ["php", "-f", "/var/www/html/cron.php", "--define", "apc.enable_cli=1"]
            volumeMounts:
            - name: nextcloud
              mountPath: /var/www/html
@@ -43,8 +23,6 @@ spec:
              mountPath: /usr/local/etc/php/conf.d/zzz-custom.ini
            - name: data
              mountPath: /data
-           - name: cache
-             mountPath: /cache
            - name: storage
              mountPath: /home-storage
          - name: preview-pre-generate
@@ -79,8 +57,6 @@ spec:
              mountPath: /usr/local/etc/php/conf.d/zzz-custom.ini
            - name: data
              mountPath: /data
-           - name: cache
-             mountPath: /cache
            - name: storage
              mountPath: /home-storage
          - name: app-update
@@ -113,8 +89,6 @@ spec:
              mountPath: /var/www/html
            - name: data
              mountPath: /data
-           - name: cache
-             mountPath: /cache
            - name: storage
              mountPath: /home-storage
          restartPolicy: OnFailure
@@ -127,10 +101,7 @@ spec:
              path: "/var/srv/nextcloud/php.ini"
          - name: data
            hostPath:
-             path: "/servers/nextcloud/data"
-         - name: cache
-           hostPath:
-             path: "/var/srv/nextcloud/cache"
+             path: "/var/srv/nextcloud/data"
          - name: storage
            hostPath:
              path: "/home-storage"
@@ -182,8 +153,6 @@ spec:
              mountPath: /usr/local/etc/php/conf.d/zzz-custom.ini
            - name: data
              mountPath: /data
-           - name: cache
-             mountPath: /cache
            - name: storage
              mountPath: /home-storage
          - name: files-scan
@@ -218,8 +187,6 @@ spec:
              mountPath: /usr/local/etc/php/conf.d/zzz-custom.ini
            - name: data
              mountPath: /data
-           - name: cache
-             mountPath: /cache
            - name: storage
              mountPath: /home-storage
          restartPolicy: OnFailure
@@ -232,10 +199,7 @@ spec:
              path: "/var/srv/nextcloud/php.ini"
          - name: data
            hostPath:
-             path: "/servers/nextcloud/data"
-         - name: cache
-           hostPath:
-             path: "/var/srv/nextcloud/cache"
+             path: "/var/srv/nextcloud/data"
          - name: storage
            hostPath:
              path: "/home-storage"

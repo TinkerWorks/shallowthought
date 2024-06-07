@@ -1,13 +1,13 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: jenkins
   namespace: jenkins
 spec:
+  serviceName: jenkins
   selector:
     matchLabels:
       app: jenkins
-  replicas: 1
   template:
     metadata:
       labels:
@@ -47,6 +47,7 @@ spec:
         - name: jenkins-home
           persistentVolumeClaim:
             claimName: jenkins-home-claim
+            
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -149,16 +150,7 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: jenkins
-  namespace: jenkins
-spec:
-  entryPoints:
-    - web
-    - websecure
-    - externalweb
-    - externalwebsecure
-  routes:
-    - match: Host(`kenjins.tinker.haus`)
+  name: jenkinsjenkins
       kind: Rule
       services:
         - name: jenkins

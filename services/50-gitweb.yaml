@@ -32,7 +32,7 @@ spec:
       volumes:
         - name: repos
           hostPath:
-            path: /servers/git
+            path: /var/srv/services/git
             type: DirectoryOrCreate
 
 ---

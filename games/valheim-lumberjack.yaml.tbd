@@ -1,9 +1,10 @@
 apiVersion: apps/v1
-kind: DaemonSet
+kind: StatefulSet
 metadata:
   name: valheim-lumberjack
   namespace: games
 spec:
+  serviceName: valheim-best-seed
   selector:
     matchLabels:
       app: valheim-lumberjack
