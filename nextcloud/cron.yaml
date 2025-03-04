@@ -1,0 +1,207 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cron-5-minutes
+  namespace: nextcloud
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  suspend: false
+  jobTemplate:
+    spec:
+      template:
+        spec:
+         containers:
+         - name: cron-php
+           image: registry.tinker.haus/nextcloud
+            # imagePullPolicy: Always
+           securityContext:
+             runAsUser: 33
+           command: ["php", "-f", "/var/www/html/cron.php", "--define", "apc.enable_cli=1"]
+           volumeMounts:
+           - name: nextcloud
+             mountPath: /var/www/html
+           - name: phpini
+             mountPath: /usr/local/etc/php/conf.d/zzz-custom.ini
+           - name: data
+             mountPath: /data
+           - name: storage
+             mountPath: /home-storage
+         - name: preview-pre-generate
+           image: registry.tinker.haus/nextcloud
+            # imagePullPolicy: Always
+           securityContext:
+             runAsUser: 33
+           command: ["/var/www/html/occ", "preview:pre-generate","-vvvv"]
+           env:
+           - name: MYSQL_HOST
+             value: db
+           - name: MYSQL_DATABASE
+             value: nextcloud
+           - name: MYSQL_PASSWORD
+             value: nextcloud
+           - name: MYSQL_USER
+             value: nextcloud
+           - name: MYSQL_ROOT_PASSWORD
+             value: nextcloud
+           - name: REDIS_HOST
+             value: redis
+           - name: NEXTCLOUD_DATA_DIR
+             value: "/data"
+           - name: PHP_MEMORY_LIMIT
+             value: "3072M"
+           - name: PHP_UPLOAD_LIMIT
+             value: "0"
+           volumeMounts:
+           - name: nextcloud
+             mountPath: /var/www/html
+           - name: phpini
+             mountPath: /usr/local/etc/php/conf.d/zzz-custom.ini
+           - name: data
+             mountPath: /data
+           - name: storage
+             mountPath: /home-storage
+         - name: app-update
+           image: registry.tinker.haus/nextcloud
+            # imagePullPolicy: Always
+           securityContext:
+             runAsUser: 33
+           command: ["/var/www/html/occ", "app:update", "--all", "-n", "-vvvv"]
+           env:
+           - name: MYSQL_HOST
+             value: db
+           - name: MYSQL_DATABASE
+             value: nextcloud
+           - name: MYSQL_PASSWORD
+             value: nextcloud
+           - name: MYSQL_USER
+             value: nextcloud
+           - name: MYSQL_ROOT_PASSWORD
+             value: nextcloud
+           - name: REDIS_HOST
+             value: redis
+           - name: NEXTCLOUD_DATA_DIR
+             value: "/data"
+           - name: PHP_MEMORY_LIMIT
+             value: "3072M"
+           - name: PHP_UPLOAD_LIMIT
+             value: "0"
+           volumeMounts:
+           - name: nextcloud
+             mountPath: /var/www/html
+           - name: data
+             mountPath: /data
+           - name: storage
+             mountPath: /home-storage
+         restartPolicy: OnFailure
+         volumes:
+         - name: nextcloud
+           hostPath:
+             path: "/srv/nextcloud/html"
+         - name: phpini
+           hostPath:
+             path: "/srv/nextcloud/php.ini"
+         - name: data
+           hostPath:
+             path: "/srv/nextcloud/data"
+         - name: storage
+           hostPath:
+             path: "/home-storage"
+
+# ---
+# apiVersion: batch/v1
+# kind: CronJob
+# metadata:
+#   name: cron-daily
+#   namespace: nextcloud
+# spec:
+#   schedule: "0 3 * * *"
+#   concurrencyPolicy: Forbid
+#   suspend: false
+#   jobTemplate:
+#     spec:
+#       template:
+#         spec:
+#          containers:
+#          - name: preview-generate-all
+#            image: registry.tinker.haus/nextcloud
+#             # imagePullPolicy: Always
+#            securityContext:
+#              runAsUser: 33
+#            command: ["/usr/bin/ionice", "-c3", "/var/www/html/occ", "preview:generate-all","-vvv"]
+#            env:
+#            - name: MYSQL_HOST
+#              value: db
+#            - name: MYSQL_DATABASE
+#              value: nextcloud
+#            - name: MYSQL_PASSWORD
+#              value: nextcloud
+#            - name: MYSQL_USER
+#              value: nextcloud
+#            - name: MYSQL_ROOT_PASSWORD
+#              value: nextcloud
+#            - name: REDIS_HOST
+#              value: redis
+#            - name: NEXTCLOUD_DATA_DIR
+#              value: "/data"
+#            - name: PHP_MEMORY_LIMIT
+#              value: "3072M"
+#            - name: PHP_UPLOAD_LIMIT
+#              value: "0"
+#            volumeMounts:
+#            - name: nextcloud
+#              mountPath: /var/www/html
+#            - name: phpini
+#              mountPath: /usr/local/etc/php/conf.d/zzz-custom.ini
+#            - name: data
+#              mountPath: /data
+#            - name: storage
+#              mountPath: /home-storage
+#          - name: files-scan
+#            image: registry.tinker.haus/nextcloud
+#             # imagePullPolicy: Always
+#            securityContext:
+#              runAsUser: 33
+#            command: ["/usr/bin/ionice", "-c3", "/var/www/html/occ", "files:scan","--all","--generate-metadata","-vvv"]
+#            env:
+#            - name: MYSQL_HOST
+#              value: db
+#            - name: MYSQL_DATABASE
+#              value: nextcloud
+#            - name: MYSQL_PASSWORD
+#              value: nextcloud
+#            - name: MYSQL_USER
+#              value: nextcloud
+#            - name: MYSQL_ROOT_PASSWORD
+#              value: nextcloud
+#            - name: REDIS_HOST
+#              value: redis
+#            - name: NEXTCLOUD_DATA_DIR
+#              value: "/data"
+#            - name: PHP_MEMORY_LIMIT
+#              value: "3072M"
+#            - name: PHP_UPLOAD_LIMIT
+#              value: "0"
+#            volumeMounts:
+#            - name: nextcloud
+#              mountPath: /var/www/html
+#            - name: phpini
+#              mountPath: /usr/local/etc/php/conf.d/zzz-custom.ini
+#            - name: data
+#              mountPath: /data
+#            - name: storage
+#              mountPath: /home-storage
+#          restartPolicy: OnFailure
+#          volumes:
+#          - name: nextcloud
+#            hostPath:
+#              path: "/srv/nextcloud/html"
+#          - name: phpini
+#            hostPath:
+#              path: "/srv/nextcloud/php.ini"
+#          - name: data
+#            hostPath:
+#              path: "/srv/nextcloud/data"
+#          - name: storage
+#            hostPath:
+#              path: "/home-storage"

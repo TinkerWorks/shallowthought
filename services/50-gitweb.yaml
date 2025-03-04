@@ -16,7 +16,7 @@ spec:
       containers:
       - name: gitweb
         image: docker-cache.tinker.haus/fraoustin/gitweb
-        imagePullPolicy: Always
+         # imagePullPolicy: Always
         ports:
         - containerPort: 80
         env:
@@ -32,7 +32,7 @@ spec:
       volumes:
         - name: repos
           hostPath:
-            path: /var/srv/services/git
+            path: /srv/services/git
             type: DirectoryOrCreate
 
 ---

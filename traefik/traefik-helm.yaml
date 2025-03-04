@@ -5,35 +5,54 @@ metadata:
   namespace: kube-system
 spec:
   valuesContent: |-
+    globalArguments:
+    - --global.checknewversion=false
+    - --global.sendanonymoususage=false
     ports:
+      e-web:
+        port: 10080
+        exposedPort: 10080
       websecure:
+        port: 443
+        exposedPort: 443
         tls:
           certResolver: letsencrypt
           domains:
             - main: "tinker.haus"
               sans:
                 - "*.tinker.haus"
-      e-web: 
-        port: 10080
-        expose: true
-        exposedPort: 10080
-      e-websecure: 
+      e-websecure:
         port: 10443
-        expose: true  
         exposedPort: 10443
+        tls:
+          enabled: true
+          certResolver: letsencrypt
+          domains:
+            - main: "tinker.haus"
+              sans:
+                - "*.tinker.haus"
+      haas:
+        port: 8123
+        exposePort: 8123
       influxdb:
         port: 8086
-        expose: true
         exposePort: 8086
+      mariadb:
+        port: 3306
+        exposePort: 3306
+      postgresql:
+        port: 5432
+        exposePort: 5432
     logs:
       general:
-        level: DEBUG
-    certResolvers:
+        level: INFO
+    certificatesResolvers:
       letsencrypt:
-        dnsChallenge:
-          provider: cloudflare
-        storage: /datalocal/acme.json
-        email: "alex.sever.h@gmail.com"
+        acme:
+          dnsChallenge:
+            provider: cloudflare
+          storage: /datalocal/certs/acme.json
+          email: "alex.sever.h@gmail.com"
     providers:
       kubernetesCRD:
         allowCrossNamespace: true
@@ -49,12 +68,18 @@ spec:
             key: apiKey
             name: cloudflare-api-credentials
     deployment:
-      additionalVolumes: 
+      additionalVolumes:
         - name: datalocal
           hostPath:
-            path: /var/srv/traefik/traefik/data
-    additionalVolumeMounts: 
+            path: /srv/traefik/data/
+    additionalVolumeMounts:
       - name: datalocal
-        mountPath: "/datalocal" 
-        
-     
+        mountPath: "/datalocal"
+    ingressRoute:
+      dashboard:
+        enabled: true
+        # Custom match rule with host domain
+        matchRule: Host(`traefik.tinker.haus`)
+        entryPoints:
+          - "web"
+          - "websecure"

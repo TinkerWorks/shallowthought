@@ -18,7 +18,7 @@ spec:
       containers:
         - name: redis
           image: docker-cache.tinker.haus/library/redis
-          imagePullPolicy: Always
+           # imagePullPolicy: Always
           env:
             - name: TZ
               value: Europe/Bucharest

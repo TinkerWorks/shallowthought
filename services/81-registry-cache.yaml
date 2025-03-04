@@ -17,6 +17,7 @@ spec:
       containers:
       - name: docker-cache
         image: docker.io/library/registry
+         # imagePullPolicy: IfNotPresent
         ports:
         - name: main
           containerPort: 5000
@@ -29,7 +30,7 @@ spec:
       volumes:
         - name: registry
           hostPath:
-            path: /var/srv/services/docker-cache
+            path: /srv/services/docker-cache
             type: DirectoryOrCreate
         - name: docker-cache-config-yml
           configMap:

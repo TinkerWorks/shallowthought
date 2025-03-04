@@ -17,10 +17,9 @@ spec:
     spec:
       containers:
       - name: postgresql
-        image: docker-cache.tinker.haus/library/postgres:latest
-        #image: docker-cache.tinker.haus/pgautoupgrade/pgautoupgrade
+        #image: docker-cache.tinker.haus/library/postgres:latest
+        image: docker-cache.tinker.haus/pgautoupgrade/pgautoupgrade
         args: ["-c", "max_connections=1000"]
-        imagePullPolicy: Always
         ports:
         - containerPort: 5432
           protocol: TCP
@@ -42,7 +41,6 @@ spec:
             mountPath: /dev/shm
       - name: pgadmin
         image: docker-cache.tinker.haus/dpage/pgadmin4
-        imagePullPolicy: Always
         env:
         - name: PGADMIN_DEFAULT_EMAIL
           value: admin@tinker.haus
@@ -53,10 +51,17 @@ spec:
         ports:
         - containerPort: 80
           protocol: TCP
+        volumeMounts:
+          - name: pgadmin
+            mountPath: /var/lib/pgadmin
       volumes:
         - name: db
           hostPath:
-            path: /var/srv/db/postgresql/data
+            path: /srv/db/postgresql/data
+            type: DirectoryOrCreate
+        - name: pgadmin
+          hostPath:
+            path: /srv/db/postgresql/pgadmin
             type: DirectoryOrCreate
         - name: shm
           emptyDir:

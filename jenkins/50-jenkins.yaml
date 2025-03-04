@@ -19,8 +19,9 @@ spec:
         runAsGroup: 1000
       containers:
       - name: jenkins
-        image: registry.tinker.haus/jenkins # jenkins/jenkins:latest
-        imagePullPolicy: Always
+        image: registry.tinker.haus/jenkins
+         # registry.tinker.haus/jenkins # jenkins/jenkins:latest
+         # imagePullPolicy: Always
         ports:
         - name: webui
           containerPort: 8080
@@ -47,7 +48,7 @@ spec:
         - name: jenkins-home
           persistentVolumeClaim:
             claimName: jenkins-home-claim
-            
+
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -62,7 +63,7 @@ spec:
   resources:
     requests:
       storage: 100Gi
-        
+
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -78,7 +79,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: my-local-storage
   local:
-    path: /var/srv/jenkins/home
+    path: /srv/jenkins/home
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -101,7 +102,7 @@ spec:
   resources:
     requests:
       storage: 500Gi
-        
+
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -117,7 +118,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: my-local-storage
   local:
-    path: /var/srv/jenkins/workspace
+    path: /srv/jenkins/workspace
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -146,6 +147,7 @@ spec:
   type: NodePort
   selector:
     app: jenkins
+
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute

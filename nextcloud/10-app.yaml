@@ -17,7 +17,7 @@ spec:
       containers:
       - name: app
         image: registry.tinker.haus/nextcloud
-        imagePullPolicy: Always
+         # imagePullPolicy: Always
         env:
         - name: MYSQL_HOST
           value: mariadb.db
@@ -50,13 +50,13 @@ spec:
       volumes:
       - name: nextcloud
         hostPath:
-          path: "/var/srv/nextcloud/html"
+          path: "/srv/nextcloud/html"
       - name: phpini
         hostPath:
-          path: "/var/srv/nextcloud/php.ini"
+          path: "/srv/nextcloud/php.ini"
       - name: data
         hostPath:
-          path: "/var/srv/nextcloud/data"
+          path: "/srv/nextcloud/data"
       - name: storage
         hostPath:
           path: "/home-storage"

@@ -16,7 +16,7 @@ spec:
       containers:
       - name: mealie
         image: docker-cache.tinker.haus/hkotel/mealie
-        imagePullPolicy: Always
+         # imagePullPolicy: Always
         env:
           - name: ALLOW_SIGNUP
             value: "true"
@@ -24,6 +24,18 @@ spec:
             value: "Europe/Bucharest"
           - name: BASE_URL
             value: "https://mealie.tinker.haus"
+          - name: DB_ENGINE
+            value: "postgres"
+          - name: POSTGRES_USER
+            value: "mealie"
+          - name: POSTGRES_PASSWORD
+            value: "mealie"
+          - name: POSTGRES_SERVER
+            value: postgresql.db
+          - name: POSTGRES_PORT
+            value: "5432"
+          - name: POSTGRES_DB
+            value: "mealie"
         ports:
           - containerPort: 9000
         volumeMounts:
@@ -32,7 +44,7 @@ spec:
       volumes:
         - name: data
           hostPath:
-            path: /var/srv/homeautomation/mealie/app/data
+            path: /srv/homeautomation/mealie/app/data
             type: DirectoryOrCreate
 
 ---

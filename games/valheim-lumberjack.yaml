@@ -23,11 +23,11 @@ spec:
         image: docker-cache.tinker.haus/lloesche/valheim-server
         imagePullPolicy: Always
         ports:
-        - containerPort: 12456
+        - containerPort: 42456
           protocol: UDP
-        - containerPort: 12457
+        - containerPort: 42457
           protocol: UDP
-        - containerPort: 12458
+        - containerPort: 42458
           protocol: UDP
         env:
         - name: WORLD_NAME
@@ -39,7 +39,7 @@ spec:
         - name: SERVER_PUBLIC
           value: "false"
         - name: SERVER_PORT
-          value: "12456"
+          value: "42456"
         - name: TZ
           value: "Europe/Bucharest"
         volumeMounts:
@@ -50,9 +50,9 @@ spec:
       volumes:
         - name: config
           hostPath:
-            path: /var/srv/games/valheim-lumberjack/config
+            path: /srv/games/valheim-lumberjack/config
             type: DirectoryOrCreate
         - name: server
           hostPath:
-            path: /var/srv/games/valheim-lumberjack/server
+            path: /srv/games/valheim-lumberjack/server
             type: DirectoryOrCreate

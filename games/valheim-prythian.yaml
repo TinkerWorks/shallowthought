@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: valheim-best-seed
+  name: valheim-prythian
   namespace: games
 spec:
   serviceName: valheim-best-seed
   selector:
     matchLabels:
-      app: valheim-best-seed
+      app: valheim-prythian
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
@@ -15,32 +15,31 @@ spec:
   template:
     metadata:
       labels:
-        app: valheim-best-seed
+        app: valheim-prythian
     spec:
       hostNetwork: true
       containers:
-      - name: valheim-best-seed
+      - name: valheim-prythian
         image: docker-cache.tinker.haus/lloesche/valheim-server
-         # imagePullPolicy: Always
         ports:
-        - name: statusport
-          containerPort: 22458
+        - name: status
+          containerPort: 52458
           protocol: TCP
         - name: gameport
-          containerPort: 22456
+          containerPort: 52456
           protocol: UDP
         - name: queryport
-          containerPort: 22457
+          containerPort: 52457
           protocol: UDP
         env:
         - name: SERVER_NAME
-          value: "BestServer"
+          value: "Prythian"
         - name: SERVER_PORT
-          value: "22456"
+          value: "52456"
         - name: WORLD_NAME
-          value: "BestWorld"
+          value: "Prythian"
         - name: SERVER_PASS
-          value: "%%VALHEIM_PASS%%"
+          value: ""
         - name: SERVER_PUBLIC
           value: "false"
         - name: TZ
@@ -50,7 +49,7 @@ spec:
         - name: STATUS_HTTP
           value: "true"
         - name: STATUS_HTTP_PORT
-          value: "22458"
+          value: "52458"
         volumeMounts:
           - name: config
             mountPath: /config
@@ -59,9 +58,9 @@ spec:
       volumes:
         - name: config
           hostPath:
-            path: /srv/games/valheim-best-seed/config
+            path: /srv/games/valheim-prythian/config
             type: DirectoryOrCreate
         - name: server
           hostPath:
-            path: /srv/games/valheim-best-seed/server
+            path: /srv/games/valheim-prythian/server
             type: DirectoryOrCreate

@@ -18,7 +18,7 @@ spec:
       containers:
         - name: imaginary
           image: docker-cache.tinker.haus/nextcloud/aio-imaginary:latest
-          imagePullPolicy: Always
+           # imagePullPolicy: Always
           env:
             - name: TZ
               value: Europe/Bucharest

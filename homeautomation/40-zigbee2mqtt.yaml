@@ -16,7 +16,7 @@ spec:
       containers:
       - name: zigbee2mqtt
         image: docker-cache.tinker.haus/koenkk/zigbee2mqtt
-        imagePullPolicy: Always
+         # imagePullPolicy: Always
         ports:
         - name: webui
           containerPort: 8123
@@ -35,12 +35,13 @@ spec:
       volumes:
         - name: data
           hostPath:
-            path: /var/srv/homeautomation/zigbee2mqtt/data
+            path: /srv/homeautomation/zigbee2mqtt/data
             type: DirectoryOrCreate
         - name: cp210x
           hostPath:
             path: /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_9a073488b729ec11a6edbd9c40c9ce8d-if00-port0 #TODO: This better
             type: CharDevice
+
 
 ---
 apiVersion: v1

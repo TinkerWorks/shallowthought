@@ -30,7 +30,7 @@ spec:
       containers:
         - name: web-frontend
           image: docker-cache.tinker.haus/library/nginx
-          imagePullPolicy: Always
+           # imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
@@ -49,11 +49,11 @@ spec:
       volumes:
         - name: nginx-config
           hostPath:
-            path: "/var/srv/nextcloud/nginx/nginx.conf"
+            path: "/srv/nextcloud/nginx/nginx.conf"
             type: FileOrCreate
         - name: nextcloud
           hostPath:
-            path: "/var/srv/nextcloud/html"
+            path: "/srv/nextcloud/html"
 
 ---
 apiVersion: v1

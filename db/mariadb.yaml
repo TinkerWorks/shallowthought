@@ -18,7 +18,7 @@ spec:
       containers:
       - name: mariadb
         image: docker-cache.tinker.haus/library/mariadb
-        imagePullPolicy: Always
+         # imagePullPolicy: Always
         args: ["--innodb-read-only-compressed=OFF"]
         ports:
         - containerPort: 3306
@@ -30,7 +30,7 @@ spec:
           mountPath: /var/lib/mysql
       - name: phpmyadmin
         image: docker-cache.tinker.haus/library/phpmyadmin
-        imagePullPolicy: Always
+         # imagePullPolicy: Always
         env:
           - name:  PMA_HOST
             value: "mariadb"
@@ -40,7 +40,7 @@ spec:
       volumes:
       - name: mariadb
         hostPath:                                                                           
-          path: "/var/srv/db/mariadb"
+          path: "/srv/db/mariadb"
       restartPolicy: Always
 
 ---

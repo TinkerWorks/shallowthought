@@ -29,7 +29,7 @@ spec:
       volumes:
         - name: registry
           hostPath:
-            path: /var/srv/services/registry
+            path: /srv/services/registry
             type: DirectoryOrCreate
         - name: registry-config-yml
           configMap:

@@ -16,7 +16,7 @@ spec:
       containers:
       - name: nodered
         image: docker-cache.tinker.haus/nodered/node-red
-        imagePullPolicy: Always
+         # imagePullPolicy: Always
         ports:
         - containerPort: 1880
         volumeMounts:
@@ -25,7 +25,7 @@ spec:
       volumes:
         - name: data
           hostPath:
-            path: /var/srv/homeautomation/nodered
+            path: /srv/homeautomation/nodered
             type: DirectoryOrCreate
 
 ---

@@ -1,67 +1,65 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: grafana
+  name: esphome
   namespace: homeautomation
 spec:
   selector:
     matchLabels:
-      app: grafana
+      app: esphome
   replicas: 1
   template:
     metadata:
       labels:
-        app: grafana
+        app: esphome
     spec:
       containers:
-      - name: grafana
-        image: docker-cache.tinker.haus/grafana/grafana
+      - name: esphome
+        image: ghcr.io/esphome/esphome
          # imagePullPolicy: Always
         ports:
-        - containerPort: 3000
-        volumeMounts:
-          - name: varlibgrafana
-            mountPath: /var/lib/grafana
+        - containerPort: 6052
         env:
-          - name: GF_AUTH_ANONYMOUS_ENABLED
-            value: "true"
-          - name: GF_AUTH_BASIC_ENABLED
-            value: "true"
+            - name: TZ
+              value: "Europe/Bucharest"
+        volumeMounts:
+          - name: config
+            mountPath: /config
       volumes:
-        - name: varlibgrafana
+        - name: config
           hostPath:
-            path: /srv/homeautomation/grafana/lib
+            path: /srv/homeautomation/esphome
             type: DirectoryOrCreate
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: grafana
+  name: esphome
   namespace: homeautomation
 spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: 3000
+    targetPort: 6052
   type: NodePort
   selector:
-    app: grafana
-    
+    app: esphome
+
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: grafana
+  name: esphome
   namespace: homeautomation
 spec:
   entryPoints:
     - web
     - websecure
   routes:
-    - match: Host(`grafana.tinker.haus`)
+    - match: Host(`esphome.tinker.haus`)
       kind: Rule
       services:
-        - name: grafana
+        - name: esphome
           port: 80
 

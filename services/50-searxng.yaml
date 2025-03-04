@@ -16,7 +16,7 @@ spec:
       containers:
       - name: searxng
         image: docker-cache.tinker.haus/searxng/searxng
-        imagePullPolicy: Always
+         # imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:
@@ -30,7 +30,7 @@ spec:
       volumes:
         - name: repos
           hostPath:
-            path: /var/srv/services/searxng
+            path: /srv/services/searxng
             type: DirectoryOrCreate
 
 ---

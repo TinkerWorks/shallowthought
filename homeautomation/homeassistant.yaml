@@ -15,8 +15,9 @@ spec:
     spec:
       containers:
       - name: homeassistant
-        image: docker-cache.tinker.haus/homeassistant/home-assistant:latest
-        imagePullPolicy: Always
+        #image: docker-cache.tinker.haus/homeassistant/home-assistant:latest
+        image: registry.tinker.haus/homeassistant:latest
+         # imagePullPolicy: Always
         ports:
         - name: webui
           containerPort: 8123
@@ -41,7 +42,7 @@ spec:
       - name: whisper # speech-to-text
         image: docker-cache.tinker.haus/rhasspy/wyoming-whisper:latest
         args: ["--mode=medium-int8", "--language=en", "--beam-size=2"]
-        imagePullPolicy: Always
+         # imagePullPolicy: Always
         ports:
         - name: whisper
           containerPort: 10300
@@ -55,7 +56,7 @@ spec:
       - name: piper # text-to-speech
         image: docker-cache.tinker.haus/rhasspy/wyoming-piper:latest
         args: ["--voice=en-us-libritts-high"]
-        imagePullPolicy: Always
+         # imagePullPolicy: Always
         ports:
         - name: piper
           containerPort: 10200
@@ -72,7 +73,7 @@ spec:
 #          - --preload-model='ok_nabu'
           - --custom-model-dir=/custom
 #          - --uri='tcp://0.0.0.0:10400'
-        imagePullPolicy: Always
+         # imagePullPolicy: Always
         ports:
         - name: openwakeword
           containerPort: 10400
@@ -86,19 +87,19 @@ spec:
       volumes:
         - name: config
           hostPath:
-            path: /var/srv/homeautomation/haas/config
+            path: /srv/homeautomation/haas/config
             type: DirectoryOrCreate
         - name: whisper-data
           hostPath:
-            path: /var/srv/homeautomation/haas/whisper-data
+            path: /srv/homeautomation/haas/whisper-data
             type: DirectoryOrCreate
         - name: piper-data
           hostPath:
-            path: /var/srv/homeautomation/haas/piper-data
+            path: /srv/homeautomation/haas/piper-data
             type: DirectoryOrCreate
         - name: openwakeword-data
           hostPath:
-            path: /var/srv/homeautomation/haas/openwakeword-data
+            path: /srv/homeautomation/haas/openwakeword-data
             type: DirectoryOrCreate
 
 ---
@@ -126,6 +127,7 @@ spec:
   entryPoints:
     - web
     - websecure
+    - haas
   routes:
     - match: Host(`homeassistant.tinker.haus`)
       kind: Rule
