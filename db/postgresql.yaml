@@ -17,8 +17,11 @@ spec:
     spec:
       containers:
       - name: postgresql
-        #image: docker-cache.tinker.haus/library/postgres:latest
-        image: docker-cache.tinker.haus/pgautoupgrade/pgautoupgrade
+        image: registry.tinker.haus/postgres:latest
+        # image: docker.io/pgautoupgrade/pgautoupgrade:debian
+        # image: ghcr.io/tensorchord/pgvecto-rs:pg17-v0.4.0
+        # image: ghcr.io/immich-app/postgres:17-vectorchord0.3.0-pgvector0.8.0-pgvectors0.3.0
+        imagePullPolicy: Always
         args: ["-c", "max_connections=1000"]
         ports:
         - containerPort: 5432
@@ -40,7 +43,7 @@ spec:
           - name: shm
             mountPath: /dev/shm
       - name: pgadmin
-        image: docker-cache.tinker.haus/dpage/pgadmin4
+        image: docker.io/dpage/pgadmin4
         env:
         - name: PGADMIN_DEFAULT_EMAIL
           value: admin@tinker.haus
