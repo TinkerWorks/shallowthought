@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: crowdsec
+
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: crowdsec
+  namespace: crowdsec
+spec:
+  repo: https://crowdsecurity.github.io/helm-charts
+  chart: crowdsec
+  targetNamespace: crowdsec
+  valuesContent: |-
+    # for raw logs format: json or cri (docker|containerd)
+    container_runtime: containerd
+    agent:
+      # Specify each pod whose logs you want to process
+      acquisition:
+        # The namespace where the pod is located
+        - namespace: kube-system
+          # The pod  name
+          podName: traefik-*
+          # as in crowdsec configuration, we need to specify the program name to find a matching parser
+          program: traefik
+      env:
+        - name: COLLECTIONS
+          value: "crowdsecurity/traefik"
+    lapi:
+      env:
+        # To enroll the Security Engine to the console
+        - name: ENROLL_KEY
+          value: "%%CROWDSEC_ENROLL_KEY%%"
+        - name: ENROLL_INSTANCE_NAME
+          value: "shallowthought_cluster"
+        - name: ENROLL_TAGS
+          value: "k3s shallowthought"
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: bouncer
+  namespace: crowdsec
+spec:
+  plugin:
+    crowdsec-bouncer-traefik-plugin:
+      enabled: true
+      crowdsecMode: stream
+      crowdsecLapiScheme: http
+      crowdsecLapiHost: crowdsec-service.crowdsec:8080
+      crowdsecLapiKey: "%%CROWDSEC_BOUNCER_KEY%%"
+      logLevel: ERROR
+      forwardedHeadersTrustedIPs:
+        - 10.42.0.0/24
