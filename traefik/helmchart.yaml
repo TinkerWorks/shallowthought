@@ -1,0 +1,203 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    globalArguments:
+    - --global.checknewversion=false
+    - --global.sendanonymoususage=false
+    service:
+      spec:
+        externalTrafficPolicy: Local
+    ports:
+      web:
+        redirections:
+          entryPoint:
+            to: websecure
+            scheme: https
+        forwardedHeaders:
+          trustedIPs:
+            - 10.0.0.1/8
+        proxyProtocol:
+          trustedIPs:
+            - 10.0.0.1/8
+      e-web:
+        port: 10080
+        exposedPort: 10080
+        expose:
+          default: true
+        redirections:
+          entryPoint:
+            to: websecure
+            scheme: https
+        forwardedHeaders:
+          trustedIPs:
+            - 10.0.0.1/8
+            - 103.21.244.0/22
+            - 103.22.200.0/22
+            - 103.31.4.0/22
+            - 104.16.0.0/13
+            - 104.24.0.0/14
+            - 108.162.192.0/18
+            - 131.0.72.0/22
+            - 141.101.64.0/18
+            - 162.158.0.0/15
+            - 172.64.0.0/13
+            - 173.245.48.0/20
+            - 188.114.96.0/20
+            - 190.93.240.0/20
+            - 197.234.240.0/22
+            - 198.41.128.0/17
+        proxyProtocol:
+          trustedIPs:
+            - 10.0.0.1/8
+            - 103.21.244.0/22
+            - 103.22.200.0/22
+            - 103.31.4.0/22
+            - 104.16.0.0/13
+            - 104.24.0.0/14
+            - 108.162.192.0/18
+            - 131.0.72.0/22
+            - 141.101.64.0/18
+            - 162.158.0.0/15
+            - 172.64.0.0/13
+            - 173.245.48.0/20
+            - 188.114.96.0/20
+            - 190.93.240.0/20
+            - 197.234.240.0/22
+            - 198.41.128.0/17
+      websecure:
+        port: 443
+        exposedPort: 443
+        forwardedHeaders:
+          trustedIPs:
+            - 10.0.0.1/8
+        proxyProtocol:
+          trustedIPs:
+            - 10.0.0.1/8
+        tls:
+          certResolver: letsencrypt
+          domains:
+            - main: "tinker.haus"
+              sans:
+                - "*.tinker.haus"
+        transport:
+          respondingTimeouts:
+            readTimeout: 600s
+            idleTimeout: 600s
+            writeTimeout: 600s
+      e-websecure:
+        port: 10443
+        exposedPort: 10443
+        expose:
+          default: true
+        forwardedHeaders:
+          trustedIPs:
+            - 103.21.244.0/22
+            - 103.22.200.0/22
+            - 103.31.4.0/22
+            - 104.16.0.0/13
+            - 104.24.0.0/14
+            - 108.162.192.0/18
+            - 131.0.72.0/22
+            - 141.101.64.0/18
+            - 162.158.0.0/15
+            - 172.64.0.0/13
+            - 173.245.48.0/20
+            - 188.114.96.0/20
+            - 190.93.240.0/20
+            - 197.234.240.0/22
+            - 198.41.128.0/17
+        proxyProtocol:
+          trustedIPs:
+            - 103.21.244.0/22
+            - 103.22.200.0/22
+            - 103.31.4.0/22
+            - 104.16.0.0/13
+            - 104.24.0.0/14
+            - 108.162.192.0/18
+            - 131.0.72.0/22
+            - 141.101.64.0/18
+            - 162.158.0.0/15
+            - 172.64.0.0/13
+            - 173.245.48.0/20
+            - 188.114.96.0/20
+            - 190.93.240.0/20
+            - 197.234.240.0/22
+            - 198.41.128.0/17
+        tls:
+          enabled: true
+          certResolver: letsencrypt
+          domains:
+            - main: "tinker.haus"
+              sans:
+                - "*.tinker.haus"
+        transport:
+          respondingTimeouts:
+            readTimeout: 600s
+            idleTimeout: 600s
+            writeTimeout: 600s
+      haas:
+        port: 8123
+        exposePort: 8123
+      influxdb:
+        port: 8086
+        exposePort: 8086
+      mariadb:
+        port: 3306
+        exposePort: 3306
+      postgresql:
+        port: 5432
+        exposePort: 5432
+    logs:
+      general:
+        level: INFO
+      access:
+        enabled: true
+    certificatesResolvers:
+      letsencrypt:
+        acme:
+          dnsChallenge:
+            provider: cloudflare
+          storage: /datalocal/certs/acme.json
+          email: "alex.sever.h@gmail.com"
+    providers:
+      kubernetesCRD:
+        allowCrossNamespace: true
+    env:
+      - name: CF_API_EMAIL
+        valueFrom:
+          secretKeyRef:
+            key: email
+            name: cloudflare-api-credentials
+      - name: CF_API_KEY
+        valueFrom:
+          secretKeyRef:
+            key: apiKey
+            name: cloudflare-api-credentials
+    deployment:
+      additionalVolumes:
+        - name: datalocal
+          hostPath:
+            path: /srv/traefik/data/
+    additionalVolumeMounts:
+      - name: datalocal
+        mountPath: "/datalocal"
+    ingressRoute:
+      dashboard:
+        enabled: true
+        # Custom match rule with host domain
+        matchRule: Host(`traefik.tinker.haus`)
+        entryPoints:
+          - "web"
+          - "websecure"
+    experimental:
+      plugins:
+        example:
+          moduleName: github.com/traefik/plugindemo
+          version: v0.2.1
+        crowdsec-bouncer-traefik-plugin:
+          moduleName: "github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin"
+          version: "v1.4.2"
