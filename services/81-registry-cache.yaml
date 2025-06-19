@@ -16,7 +16,7 @@ spec:
       priorityClassName: system-cluster-critical
       containers:
       - name: docker-cache
-        image: docker.io/library/registry
+        image: docker.io/library/registry:2.8
          # imagePullPolicy: IfNotPresent
         ports:
         - name: main
