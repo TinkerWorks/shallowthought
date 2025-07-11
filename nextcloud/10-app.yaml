@@ -36,9 +36,15 @@ spec:
           value: redis
         - name: NEXTCLOUD_DATA_DIR
           value: "/data"
+        - name: PHP_MEMORY_LIMIT
+          value: "3072M"
+        - name: PHP_UPLOAD_LIMIT
+          value: "0"
         volumeMounts:
         - name: nextcloud
           mountPath: /var/www/html
+        - name: phpini
+          mountPath: /usr/local/etc/php/conf.d/zzz-custom.ini
         - name: data
           mountPath: /data
         - name: cache
@@ -50,6 +56,9 @@ spec:
       - name: nextcloud
         hostPath:
           path: "/var/srv/nextcloud/html"
+      - name: phpini
+        hostPath:
+          path: "/var/srv/nextcloud/php.ini"
       - name: cache
         hostPath:
           path: "/var/srv/nextcloud/cache"
