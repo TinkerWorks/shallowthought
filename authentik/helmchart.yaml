@@ -33,28 +33,52 @@ spec:
         use_ssl: true
         timeout: 30
         from: "authentik@tinker.haus"
-    server:
-      ingress:
-        ingressClassName: traefik
-        enabled: true
-        hosts:
-          - authentik.tinker.haus
     redis:
       enabled: true
 
-# ---
-# apiVersion: traefik.io/v1alpha1
-# kind: IngressRoute
-# metadata:
-#   name: authentik
-#   namespace: authentik
-# spec:
-#   entryPoints:
-#     - web
-#     - websecure
-#   routes:
-#     - match: Host(`authentik.tinker.haus`)
-#       kind: Rule
-#       services:
-#         - name: authentik-server
-#           port: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: authentik
+  namespace: authentik
+spec:
+  entryPoints:
+    - web
+    - websecure
+    - e-web
+    - e-websecure
+  routes:
+    - match: Host(`authentik.tinker.haus`)
+      kind: Rule
+      services:
+        - name: authentik-server
+          port: 80
+      middlewares:
+        - name: crowdsec-bouncer@kubernetescrd
+        - name: authentik-strict-transport-security@kubernetescrd
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strict-transport-security
+  namespace: authentik
+spec:
+  headers:
+    # Strict-Transport-Security
+    stsPreload: true
+    stsSeconds: 15552000
+    customFrameOptionsValue: SAMEORIGIN
+    customResponseHeaders:
+      # Content-Security-Policy
+      #Content-Security-Policy: "default-src 'self'; script-src 'self' https://authentik.tinker.haus; object-src 'none';"
+      Content-Security-Policy: "default-src 'self' http: https: data: blob: 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval';"
+      # X-Content-Type-Options
+      X-Content-Type-Options: "nosniff"
+      # Referrer-Policy
+      Referrer-Policy: "no-referrer-when-downgrade"
+      # Permissions-Policy
+      Permissions-Policy: "geolocation=(), microphone=(), camera=(), fullscreen=(self)"
+      # The anti-clickjacking X-Frame-Options header
+      X-Frame-Options: "SAMEORIGIN"
