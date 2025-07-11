@@ -58,8 +58,6 @@ spec:
   entryPoints:
     - web
     - websecure
-    - e-web
-    - e-websecure
   routes:
     - match: Host(`searxng.tinker.haus`)
       kind: Rule
