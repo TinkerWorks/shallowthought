@@ -1,0 +1,3 @@
+[submodule "entertainment"]
+	path = entertainment
+	url = git@github.com:TinkerWorks/shallowthought-entertainment.git
