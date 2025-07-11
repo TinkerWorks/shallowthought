@@ -1,0 +1,108 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  chart: traefik
+  repo: https://containous.github.io/traefik-helm-chart
+  set:
+    hostNetwork: "true"
+    additionalArguments: "{--log.level=DEBUG,\
+                           --api.dashboard=true,\
+                           --providers.kubernetesingress=true,\
+                           --accesslog=true,\
+                           --certificatesResolvers.myresolver.acme.dnsChallenge.provider=namecheap,\
+                           --certificatesResolvers.myresolver.acme.email=alex.sever.h@gmail.com,\
+                           --certificatesResolvers.myresolver.acme.storage=/data/acme.json,\
+                           --providers.file.filename=/config/traefik.yaml}"
+    persistence.enabled: "true"
+  valuesContent: |-
+    ports:
+      mqtt:
+        port: 18830
+        expose: true
+        exposedPort: 18830
+      influxdb:
+        port: 8186
+        expose: true
+        exposedPort: 8086
+      transmission:
+        port: 31413
+        expose: true
+        exposedPort: 51413
+        protocol: UDP
+      web:
+        port: 5080
+        expose: true
+        exposedPort: 80
+      websecure:
+        port: 5443
+        expose: true
+        exposedPort: 443
+    volumes:
+      - name: namecheap-secret
+        mountPath: "/namecheap"
+        type: secret
+    env:
+      - name: NAMECHEAP_API_USER_FILE
+        value: "/namecheap/user"
+      - name: NAMECHEAP_API_KEY_FILE
+        value: "/namecheap/key"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: certs-dumper
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: certs-dumper
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: certs-dumper
+    spec:
+      containers:
+      - name: cert-dumper
+        image: ldez/traefik-certs-dumper
+        args: ["file", "--domain-subdir", "--watch", "--source", "/data/acme.json", "--crt-name", "cert", "--crt-ext", ".pem", "--key-name", "privkey", "--key-ext", ".pem", "--version", "v2" ]
+        volumeMounts:
+        - mountPath: "/data"
+          name: data
+        - mountPath: "/dump"
+          name: certificate
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: traefik
+        - name: certificate
+          hostPath:
+            path: /servers/certificate
+            type: DirectoryOrCreate
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dash
+  namespace: kube-system
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`traefik.tinker.haus`)
+      kind: Rule
+      services:
+        - name: api@internal
+          kind: TraefikService
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+  tls:
+    certResolver: myresolver
+    domains:
+      - main: "tinker.haus"
+        sans:
+          - "*.tinker.haus"

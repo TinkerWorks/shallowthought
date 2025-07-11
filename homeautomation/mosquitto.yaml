@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: mosquitto
+  namespace: homeautomation
+spec:
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+    spec:
+      containers:
+      - name: mosquitto
+        image: eclipse-mosquitto
+        ports:
+        - containerPort: 1883
+          hostPort: 1883
+        - containerPort: 9001
+          hostPort: 9001
+        volumeMounts:
+          - name: data
+            mountPath: /mosquitto/data
+          - name: config
+            mountPath: /mosquitto/config
+          - name: log
+            mountPath: /mosquitto/log
+      volumes:
+        - name: data
+          hostPath:
+            path: /servers/mosquitto/data
+            type: DirectoryOrCreate
+        - name: config
+          hostPath:
+            path: /servers/mosquitto/config
+            type: DirectoryOrCreate
+        - name: log
+          hostPath:
+            path: /servers/mosquitto/log
+            type: DirectoryOrCreate

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodered
+  namespace: homeautomation
+spec:
+  selector:
+    matchLabels:
+      app: nodered
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nodered
+    spec:
+      containers:
+      - name: nodered
+        image: nodered/node-red-docker
+        ports:
+        - containerPort: 1880
+        volumeMounts:
+          - name: data
+            mountPath: /data
+      volumes:
+        - name: data
+          hostPath:
+            path: /servers/nodered
+            type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodered
+  namespace: homeautomation
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 1880
+  type: NodePort
+  selector:
+    app: nodered
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nodered
+  namespace: homeautomation
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`nodered.tinker.haus`)
+      kind: Rule
+      services:
+        - name: nodered
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+  tls:
+    certResolver: myresolver
+    domains:
+    - main: "tinker.haus"
+      sans:
+      - "*.tinker.haus"

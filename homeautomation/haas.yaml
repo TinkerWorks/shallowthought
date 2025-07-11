@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homeassistant
+  namespace: homeautomation
+spec:
+  selector:
+    matchLabels:
+      app: homeassistant
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: homeassistant
+    spec:
+      containers:
+      - name: homeassistant
+        image: homeassistant/home-assistant:stable
+        imagePullPolicy: Always
+        ports:
+        - name: webui
+          containerPort: 8123
+        volumeMounts:
+          - name: config
+            mountPath: /config
+        livenessProbe:
+          httpGet:
+            path: /
+            port: webui
+          initialDelaySeconds: 30
+          periodSeconds: 3
+      volumes:
+        - name: config
+          hostPath:
+            path: /servers/haas/config
+            type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: homeassistant
+  namespace: homeautomation
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8123
+  type: NodePort
+  selector:
+    app: homeassistant
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: homeassistant
+  namespace: homeautomation
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`haas.tinker.haus`)
+      kind: Rule
+      services:
+        - name: homeassistant
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+  tls:
+    certResolver: myresolver
+    domains:
+    - main: "tinker.haus"
+      sans:
+      - "*.tinker.haus"

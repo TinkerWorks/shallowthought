@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-frontend
+  namespace: nextcloud
+spec:
+  selector:
+    matchLabels:
+      app: web-frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: web-frontend
+    spec:
+      containers:
+      - name: web-frontend
+        image: nginx
+        ports:
+        - containerPort: 80
+        env:
+        - name: PUID
+          value: "2001"
+        - name: PGID
+          value: "2000"
+        - name: TZ
+          value: "Europe/Bucharest"
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+        - name: html
+          mountPath: /var/www/html
+          readOnly: true
+      volumes:
+      - name: nginx-config
+        hostPath:
+          path: "/servers/nextcloud/web-frontend/nginx.conf"
+          type: File
+      - name: html
+        hostPath:
+          path: "/servers/nextcloud/html"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-frontend
+  namespace: nextcloud
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  type: NodePort
+  selector:
+    app: web-frontend
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: web-frontend-ingressroute-auth
+  namespace: nextcloud
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`nextcloud.tinker.haus`)
+      kind: Rule
+      services:
+        - name: web-frontend
+          port: 80
+      middlewares:
+        - name: nextcloud-strict-transport-security@kubernetescrd
+        - name: nextcloud-nextcloud-redirect@kubernetescrd
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: websecure-frontend-ingressroute-auth
+  namespace: nextcloud
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`nextcloud.tinker.haus`)
+      kind: Rule
+      services:
+        - name: web-frontend
+          port: 80
+      middlewares:
+        - name: nextcloud-strict-transport-security@kubernetescrd
+        - name: nextcloud-nextcloud-redirect@kubernetescrd
+  tls:
+    certResolver: myresolver
+    domains:
+    - main: "tinker.haus"
+      sans:
+      - "*.tinker.haus"

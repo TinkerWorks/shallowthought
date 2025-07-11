@@ -1,0 +1,10 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strict-transport-security
+  namespace: nextcloud
+spec:
+  headers:
+    stsSeconds: 15552000
+    customFrameOptionsValue: SAMEORIGIN
+    referrerPolicy: no-referrer

@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: services
+spec:
+  selector:
+    matchLabels:
+      app: jenkins
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - name: jenkins
+        image: alseh/tinkerjenkins:latest # registry.tinker.haus/tinkerjenkins:jdk11
+        imagePullPolicy: Always
+        ports:
+        - name: webui
+          containerPort: 8080
+        - name: slaves
+          containerPort: 50000
+        env:
+          - name: TZ
+            value: "Europe/Bucharest"
+        volumeMounts:
+          - name: jenkins-home
+            mountPath: /var/jenkins_home
+        livenessProbe:
+          httpGet:
+            path: /login
+            port: webui
+          initialDelaySeconds: 30
+          periodSeconds: 3
+      volumes:
+        - name: jenkins-home
+          hostPath:
+            path: /servers/jenkins/home
+            type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins
+  namespace: services
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  type: NodePort
+  selector:
+    app: jenkins
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: jenkins-ingressroute-auth
+  namespace: services
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`kenjins.tinker.haus`)
+      kind: Rule
+      services:
+        - name: jenkins
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+        - name: services-strict-transport-security@kubernetescrd
+#        - name: redirect-redirect-to-https@kubernetescrd
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: jenkins-ingressroute-auth-tls
+  namespace: services
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`kenjins.tinker.haus`)
+      kind: Rule
+      services:
+        - name: jenkins
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+        - name: services-strict-transport-security@kubernetescrd
+#        - name: redirect-redirect-to-https@kubernetescrd
+  tls:
+    certResolver: myresolver
+    domains:
+    - main: "tinker.haus"
+      sans:
+      - "*.tinker.haus"

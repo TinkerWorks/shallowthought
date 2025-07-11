@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: db
+  name: db
+  namespace: nextcloud
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: db
+        image: mariadb
+        env:
+        - name: MYSQL_DATABASE
+          value: nextcloud
+        - name: MYSQL_PASSWORD
+          value: nextcloud
+        - name: MYSQL_USER
+          value: nextcloud
+        - name: MYSQL_ROOT_PASSWORD
+          value: nextcloud
+        volumeMounts:
+        - name: db
+          mountPath: /var/lib/mysql
+#        volumeMounts:
+#        - name: conf
+#          mountPath: /etc/mysql/conf.d
+      volumes:
+      - name: db
+        hostPath:
+          path: "/servers/nextcloud/db"
+#          path: "/var/db/mariadb"
+      - name: conf
+        hostPath:
+          path: "/servers/nextcloud/db-conf.d"
+
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: nextcloud
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+  selector:
+    app: db
+

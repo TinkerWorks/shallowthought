@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: app
+  name: app
+  namespace: nextcloud
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+      - name: app
+        image: nextcloud:fpm
+        env:
+        - name: MYSQL_HOST
+          value: db
+        - name: MYSQL_DATABASE
+          value: nextcloud
+        - name: MYSQL_PASSWORD
+          value: nextcloud
+        - name: MYSQL_USER
+          value: nextcloud
+        - name: MYSQL_ROOT_PASSWORD
+          value: nextcloud
+        - name: REDIS_HOST
+          value: redis
+        volumeMounts:
+        - name: html
+          mountPath: /var/www/html
+        - name: pictures
+          mountPath: /pictures
+        - name: tv-shows
+          mountPath: /entertainment/tv-shows
+        - name: movies
+          mountPath: /entertainment/movies
+      restartPolicy: Always
+      volumes:
+      - name: html
+        hostPath:
+          path: "/servers/nextcloud/html"
+      - name: pictures
+        hostPath:
+          path: "/pictures"
+      - name: tv-shows
+        hostPath:
+          path: "/entertainment/tv-shows"
+      - name: movies
+        hostPath:
+          path: "/entertainment/movies"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  namespace: nextcloud
+spec:
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+  selector:
+    app: app

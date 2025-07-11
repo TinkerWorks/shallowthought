@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cron
+  name: cron
+  namespace: nextcloud
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: cron
+  template:
+    metadata:
+      labels:
+        app: cron
+    spec:
+      containers:
+      - name: cron
+        image: nextcloud:fpm
+        command: ["/cron.sh"]
+        env:
+        - name: MYSQL_HOST
+          value: db
+        - name: MYSQL_DATABASE
+          value: nextcloud
+        - name: MYSQL_PASSWORD
+          value: nextcloud
+        - name: MYSQL_USER
+          value: nextcloud
+        - name: MYSQL_ROOT_PASSWORD
+          value: nextcloud
+        - name: REDIS_HOST
+          value: redis
+        volumeMounts:
+        - name: html
+          mountPath: /var/www/html
+      restartPolicy: Always
+      volumes:
+      - name: html
+        hostPath:
+          path: "/servers/nextcloud/html"

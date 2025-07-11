@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb
+  namespace: homeautomation
+spec:
+  selector:
+    matchLabels:
+      app: influxdb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb
+        ports:
+        - containerPort: 8086
+        volumeMounts:
+          - name: db
+            mountPath: /var/lib/influxdb
+      volumes:
+        - name: db
+          hostPath:
+            path: /servers/influxdb_noCoW
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb
+  namespace: homeautomation
+spec:
+  ports:
+  - port: 8086
+    protocol: TCP
+    targetPort: 8086
+  type: NodePort
+  selector:
+    app: influxdb
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: influxdb
+  namespace: homeautomation
+spec:
+  entryPoints:
+    - influxdb
+  routes:
+  - match: HostSNI(`*`)
+    services:
+    - name: influxdb
+      port: 8086

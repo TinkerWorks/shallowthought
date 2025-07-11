@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openhab
+  namespace: homeautomation
+spec:
+  selector:
+    matchLabels:
+      app: openhab
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: openhab
+    spec:
+      containers:
+      - name: openhab
+        image: openhab/openhab:2.5.0
+        ports:
+        - containerPort: 28080
+        volumeMounts:
+          - name: addons
+            mountPath: /openhab/addons
+          - name: conf
+            mountPath: /openhab/conf
+          - name: userdata
+            mountPath: /openhab/userdata
+        env:
+          - name: OPENHAB_HTTP_PORT
+            value: "28080"
+          - name: OPENHAB_HTTPS_PORT
+            value: "28443"
+      volumes:
+        - name: addons
+          hostPath:
+            path: /servers/openhab/addons
+            type: DirectoryOrCreate
+        - name: conf
+          hostPath:
+            path: /servers/openhab/conf
+            type: DirectoryOrCreate
+        - name: userdata
+          hostPath:
+            path: /servers/openhab/userdata
+            type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openhab
+  namespace: homeautomation
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 28080
+  type: NodePort
+  selector:
+    app: openhab
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: openhab
+  namespace: homeautomation
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`openhab.tinker.haus`)
+      kind: Rule
+      services:
+        - name: openhab
+          port: 80
+      middlewares:
+        - name: default-ip-whitelist-local@kubernetescrd
+  tls:
+    certResolver: myresolver
+    domains:
+    - main: "tinker.haus"
+      sans:
+      - "*.tinker.haus"

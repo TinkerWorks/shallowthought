@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: unifi
+  namespace: services
+spec:
+  selector:
+    matchLabels:
+      app: unifi
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: unifi
+    spec:
+      hostNetwork: true
+      containers:
+      - name: unifi
+        image: jacobalberty/unifi:latest
+        ports:
+        - containerPort: 3478  # UDP Port used for STUN.
+          protocol: UDP
+        - containerPort: 5514   # TCP Port used for remote syslog capture.
+        - containerPort: 8080   # TCP Port used for device and controller communication.
+        - containerPort: 8443   # TCP Port used for controller GUI/API as seen in a web browser
+        - containerPort: 8880   # TCP Port used for HTTP portal redirection.
+        - containerPort: 8843   # TCP Port used for HTTPS portal redirection.
+        - containerPort: 6789   # TCP Port used for UniFi mobile speed test.
+        - containerPort: 27117  # TCP Port used for local-bound database communication.
+        - containerPort: 5656   # UDP Ports 5656-5699 used by AP-EDU broadcasting.
+          protocol: UDP
+        - containerPort: 10001  # UDP Port used for device discovery
+          protocol: UDP
+        - containerPort: 1900   # UDP Port used for "Make controller discoverable on L2 network" in controller settings.
+          protocol: UDP
+        volumeMounts:
+          - name: data
+            mountPath: /unifi/data
+          - name: log
+            mountPath: /unifi/log
+#          - name: cert
+#            mountPath: /unifi/cert
+        env:
+          - name: TZ
+            value: "Europe/Bucharest"
+          - name: CERT_IS_CHAIN
+            value: "true"
+      volumes:
+        - name: data
+          hostPath:
+            path: /var/db/unifi
+            type: DirectoryOrCreate
+        - name: log
+          hostPath:
+            path: /servers/unifi/log
+            type: DirectoryOrCreate
+        - name: cert
+          hostPath:
+            path: /servers/certificate/tinker.haus
+            type: Directory
