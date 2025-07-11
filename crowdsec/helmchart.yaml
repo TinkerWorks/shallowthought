@@ -28,6 +28,10 @@ spec:
       env:
         - name: COLLECTIONS
           value: "crowdsecurity/traefik"
+      persistentVolume:
+        config:
+          enabled: true
+          storageClassName: "crowdsec-agent-config" 
     lapi:
       env:
         # To enroll the Security Engine to the console
@@ -37,6 +41,58 @@ spec:
           value: "shallowthought_cluster"
         - name: ENROLL_TAGS
           value: "k3s shallowthought"
+        - name: BOUNCER_KEY_traefik
+          value: "%%CROWDSEC_BOUNCER_KEY%%"
+      persistentVolume:
+        config:
+          storageClassName: "crowdsec-lapi-config" 
+        data:
+          storageClassName: "crowdsec-lapi-data" 
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: crowdsec-lapi-data
+  namespace: crowdsec
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: "crowdsec-lapi-data" 
+  hostPath:
+    path: /srv/crowdsec/lapi/data
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: crowdsec-lapi-config
+  namespace: crowdsec
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: "crowdsec-lapi-config" 
+  hostPath:
+    path: /srv/crowdsec/lapi/config
+    
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: crowdsec-agent-config
+  namespace: crowdsec
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: "crowdsec-agent-config" 
+  hostPath:
+    path: /srv/crowdsec/agent/config
 
 ---
 apiVersion: traefik.io/v1alpha1
