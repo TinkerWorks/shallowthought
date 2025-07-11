@@ -114,18 +114,46 @@ metadata:
   name: cron-daily
   namespace: nextcloud
 spec:
-  schedule: "0 4 * * *"
+  schedule: "0 3 * * *"
   concurrencyPolicy: Forbid
+  suspend: false
   jobTemplate:
     spec:
       template:
         spec:
          containers:
-         - name: cron-php
+         - name: preview-generate-all
            image: registry.tinker.haus/nextcloud
            securityContext:
              runAsUser: 33
-           command: ["/var/www/html/occ", "preview:generate-all","-vvv"]
+           command: ["/usr/bin/ionice", "-c3", "/var/www/html/occ", "preview:generate-all","-vvv"]
+           env:
+           - name: MYSQL_HOST
+             value: db
+           - name: MYSQL_DATABASE
+             value: nextcloud
+           - name: MYSQL_PASSWORD
+             value: nextcloud
+           - name: MYSQL_USER
+             value: nextcloud
+           - name: MYSQL_ROOT_PASSWORD
+             value: nextcloud
+           - name: REDIS_HOST
+             value: redis
+           volumeMounts:
+           - name: nextcloud
+             mountPath: /var/www/html
+           - name: data
+             mountPath: /data
+           - name: cache
+             mountPath: /cache
+           - name: storage
+             mountPath: /home-storage
+         - name: files-scan
+           image: registry.tinker.haus/nextcloud
+           securityContext:
+             runAsUser: 33
+           command: ["/usr/bin/ionice", "-c3", "/var/www/html/occ", "files:scan","--all","--generate-metadata","-vvv"]
            env:
            - name: MYSQL_HOST
              value: db
