@@ -39,7 +39,10 @@ spec:
         - name: WORLD_NAME
           value: "Prythian"
         - name: SERVER_PASS
-          value: ""
+          valueFrom:
+           secretKeyRef:
+            name: valheim-secret
+            key: server-pass
         - name: SERVER_PUBLIC
           value: "false"
         - name: TZ

@@ -21,15 +21,14 @@ spec:
       containers:
       - name: valheim-hh
         image: docker-cache.tinker.haus/lloesche/valheim-server
-         # imagePullPolicy: Always
         ports:
         - name: status
           containerPort: 12458
           protocol: TCP
-        - name: gameport
+        - name: game
           containerPort: 12456
           protocol: UDP
-        - name: queryport
+        - name: query
           containerPort: 12457
           protocol: UDP
         env:
@@ -40,7 +39,10 @@ spec:
         - name: WORLD_NAME
           value: "OmicronPersei8"
         - name: SERVER_PASS
-          value: "%%VALHEIM_PASS%%"
+          valueFrom:
+           secretKeyRef:
+            name: valheim-secret
+            key: server-pass
         - name: SERVER_PUBLIC
           value: "false"
         - name: TZ

@@ -21,27 +21,38 @@ spec:
       containers:
       - name: valheim-lumberjack
         image: docker-cache.tinker.haus/lloesche/valheim-server
-        imagePullPolicy: Always
         ports:
-        - containerPort: 42456
+        - name: status
+          containerPort: 42458
+          protocol: TCP
+        - name: game
+          containerPort: 42456
           protocol: UDP
-        - containerPort: 42457
-          protocol: UDP
-        - containerPort: 42458
+        - name: query
+          containerPort: 42457
           protocol: UDP
         env:
-        - name: WORLD_NAME
-          value: "I'm a lumberjack and I'm OK"
         - name: SERVER_NAME
           value: "tinker.haus"
-        - name: SERVER_PASS
-          value: "%%VALHEIM_PASS%%"
-        - name: SERVER_PUBLIC
-          value: "false"
         - name: SERVER_PORT
           value: "42456"
+        - name: WORLD_NAME
+          value: "I'm a lumberjack and I'm OK"
+        - name: SERVER_PASS
+          valueFrom:
+           secretKeyRef:
+            name: valheim-secret
+            key: server-pass
+        - name: SERVER_PUBLIC
+          value: "false"
         - name: TZ
           value: "Europe/Bucharest"
+        - name: BACKUPS_MAX_AGE
+          value: "14"
+        - name: STATUS_HTTP
+          value: "true"
+        - name: STATUS_HTTP_PORT
+          value: "12458"
         volumeMounts:
           - name: config
             mountPath: /config
