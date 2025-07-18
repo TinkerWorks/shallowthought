@@ -182,9 +182,14 @@ spec:
         - name: datalocal
           hostPath:
             path: /srv/traefik/data/
+        - name: crowdsec
+          secret:
+            secretName: crowdsec
     additionalVolumeMounts:
       - name: datalocal
         mountPath: "/datalocal"
+      - name: crowdsec
+        mountPath: "/crowdsec"
     ingressRoute:
       dashboard:
         enabled: true

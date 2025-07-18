@@ -36,13 +36,19 @@ spec:
       env:
         # To enroll the Security Engine to the console
         - name: ENROLL_KEY
-          value: "%%CROWDSEC_ENROLL_KEY%%"
+          valueFrom:
+           secretKeyRef:
+            name: crowdsec 
+            key: 
         - name: ENROLL_INSTANCE_NAME
           value: "shallowthought_cluster"
         - name: ENROLL_TAGS
           value: "k3s shallowthought"
         - name: BOUNCER_KEY_traefik
-          value: "%%CROWDSEC_BOUNCER_KEY%%"
+          valueFrom:
+           secretKeyRef:
+            name: crowdsec
+            key: bouncer-key
       persistentVolume:
         config:
           storageClassName: "crowdsec-lapi-config" 
@@ -107,7 +113,7 @@ spec:
       crowdsecMode: stream
       crowdsecLapiScheme: http
       crowdsecLapiHost: crowdsec-service.crowdsec:8080
-      crowdsecLapiKey: "%%CROWDSEC_BOUNCER_KEY%%"
+      crowdsecLapiKeyFile: "/crowdsec/bouncer-key"
       logLevel: ERROR
       forwardedHeadersTrustedIPs:
         - 10.42.0.0/24
