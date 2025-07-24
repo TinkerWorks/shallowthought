@@ -1,3 +1,4 @@
+
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -39,7 +40,7 @@ spec:
           valueFrom:
            secretKeyRef:
             name: crowdsec 
-            key: 
+            key: enroll-key
         - name: ENROLL_INSTANCE_NAME
           value: "shallowthought_cluster"
         - name: ENROLL_TAGS
